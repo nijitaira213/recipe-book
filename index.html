@@ -501,7 +501,7 @@
           <option value="洋食">洋食</option>
           <option value="中華">中華</option>
           <option value="アジア料理">アジア料理</option>
-          <option value="おやつ・スイーツ">おやつ・スイーツ</option>
+          <option value="おやて・スイーツ">おやつ・スイーツ</option>
           <option value="サラダ">サラダ</option>
           <option value="スープ">スープ</option>
           <option value="その他">その他</option>
@@ -551,109 +551,56 @@
   <div class="modal confirm-modal" style="max-width:360px">
     <div class="modal-handle"></div>
     <h2>🗑️ レシピを削除</h2>
-    <p>「<span id="confirmName"></span>」を<br>削除してもよいですか？<br><small style="color:#aaa">この操作は元に戻せません</small></p>
-    <div class="confirm-actions">
-      <button class="btn-cancel-confirm" onclick="closeConfirm()">キャンセル</button>
-      <button class="btn-confirm-del" onclick="confirmDelete()">削除する</button>
-    </div>
-  </div>
-</div>
-
-<script>
-// ==================== DATA ====================
-const STORAGE_KEY = 'myRecipes_v1';
-const BUILTIN_KEY = 'myRecipes_builtins_v2';
-let recipes = [];
-let editingId = null;
-let deletingId = null;
-
-function getBuiltinRecipes() {
-  return [
-    {
-      id: 'builtin_kanimid',
-      name: 'かにかまときゅうりの中華サラダ',
-      emoji: '\u{1F957}', category: 'サラダ',
-      time: '10分', servings: '2人分',
-      tags: ['簡単', '中華', 'やみつき'],
-      ingredients: [
-        'かにかま 80g',
-        'きゅうり 1本',
-        'コーン缶 50g（水気を切る）',
-        'ごま油 大さじ１',
-        '酢 大さじ１',
-        'しょうゆ 小さじ１',
-        '砂糖 小さじ½',
-        '白いりごま 小さじ１',
-        '塩 少々（もみ用）'
-      ],
-      steps: [
-        'きゅうりを細切りにして塩少々でもみ、5分おいたら水気をしっかり絞る',
-        'かにかまを食べやすい大きさにほぐす',
-        'ごま油・酢・しょうゆ・砂糖をよく混ぜ合わせてドレッシングを作る',
-        'かにかま・きゅうり・コーンをボウルに入れ、ドレッシングで和える',
-        '器に盛り、白いりごまを散らして完成'
-      ],
-      notes: '冷蔵庫で３０分ほど冷やすと味がなじんでさらに美味しくなります。きゅうりの水気はしっかり絞るのがシャキシャキ食感のコツです！',
-      createdAt: Date.now()
-    },
-    {
-      id: 'builtin_nikujaga',
-      name: '肉じゃが', emoji: '\u{1F958}', category: '和食',
-      time: '40分', servings: '4人分',
-      tags: ['定番', '作り置き', '野菜'],
-      ingredients: ['じゃがいも 3個', '牛薄切り肉 150g', '玉ねぎ 1個', '人参 1本', '醤油 大さじ3', 'みりん 大さじ3', '砂糖 大さじ2'],
-      steps: ['野菜を食べやすい大きさに切る', '鍋に油を熱し、肉と野菜を炒める', '水を加えて煮立てたらアクを取る', '調味料を加えて落し蓋をして20分煮る'],
-      notes: '冷めるときに味が染みこむので、一度冷ますとより美味しい。', createdAt: Date.now() - 86400000
-    },
-    {
-      id: 'builtin_arrabiata',
-      name: 'パスタ・アラビアータ', emoji: '\u{1F35D}', category: '洋食',
-      time: '20分', servings: '2人分',
-      tags: ['簡単', 'スピード'],
-      ingredients: ['パスタ 200g', 'トマト缶 1缶', 'にんにく 2片', '唐辛子 1本', 'オリーブオイル 大さじ2', '塩・胡椒 適量'],
-      steps: ['にんにくと唐辛子を油で炒める', 'トマト缶を加えて10分煮詰める', 'パスタを茹でてソースと絡める'],
-      notes: 'ゆで汁をソースに加えると乳化しやすい。', createdAt: Date.now() - 172800000
-    },
-    {
-      id: 'builtin_banana',
-      name: 'バナナパウンドケーキ', emoji: '\u{1F34C}', category: 'おやつ・スイーツ',
-      time: '60分', servings: '8切れ',
-      tags: ['お菓子', '焼き菓子'],
-      ingredients: ['完熟バナナ 2本', '薄力粉 150g', '砂糖 80g', '卵 2個', 'バター 80g', 'ベーキングパウダー 小さじ１'],
-      steps: ['バターと砂糖をよく混ぜる', '卵を１個ずつ加えて混ぜる', 'つぶしたバナナを加える', '粉類を振るいながら折り込む', '170℃で４０分焼く'],
-      notes: '完全に冷めてから切ると綺麗に切れる。', createdAt: Date.now() - 259200000
+    <p>「<span id="confirmName"></span>」を<br>削除してアよいですか？<br><small style="color:#aaa">この操作はWE�r���j��.��f��o��f�����X[����]��\��H��ۙ�\�KXX�[ۜȏ���]ۈ�\��H���X�[��[X�ۙ�\�H�ۘ�X��H����P�ۙ�\�J
+H���x�����������؝]ۏ���]ۈ�\��H���X�ۙ�\�KY[�ۘ�X��H��ۙ�\�Q[]J
+H��bb�fi8�fx��؝]ۏ���]����]����]����KKH�\�X�\�H��KO���ܚ\ܘ�H�΋����˙��]X˘��Kٚ\�X�\�Z���L�M�Kٚ\�X�\�KX\X��\]��ȏ���ܚ\���ܚ\ܘ�H�΋����˙��]X˘��Kٚ\�X�\�Z���L�M�Kٚ\�X�\�KY�\�\�ܙKX��\]��ȏ���ܚ\����ܚ\����OOOOOOOOOOOOOOOOOOOH�T�P�T�H�ӑ�Q�OOOOOOOOOOOOOOOOOOOB��ۜ��\�X�\�P�ۙ�Y�H\R�^N��R^�T�Pّ\�֌�P���S��̞ٔ���[[Uܘ��ȋ�]]�XZ[����X�\KX����Y�ٍM��\�X�\�X\���H���ڙX�Y���X�\KX����Y�ٍM���ܘY�P�X��]���X�\KX����Y�ٍM��\�X�\�\�ܘY�K�\��Y\��Y�[���[�\�Y���L͍NMM��ȋ�\Y��N��L͍NMM��Ν�X��XL؎ML��MؘN
+���X���YH��N�\�X�\�K�[�]X[^�P\
+�\�X�\�P�ۙ�Y�N�ۜ��H�\�X�\�K��\�\�ܙJ
+N�ۜ��X�\\���H����X�[ۊ	ܙX�\\��N���OOOOOOOOOOOOOOOOOOOHUHOOOOOOOOOOOOOOOOOOOB�]�X�\\�H�N]Y][��YH�[][][��YH�[][�]ۙHH�[�N��[��[ۈ�]�Z[[��X�\\�
+H�]\��Y�	؝Z[[���[�[ZY	���[YN�	��b��j��b��o��j8�cx�x�a�ࢸ�k�.+z#���x��x��	��[[ښN�	�'�e���]Y�ܞN�	��x��x��	��[YN�	�L9b!���\��[��Έ	̹.��b!���Y�Έ���(ycf	�	�.+z#���	��8�o��i8�cI�K�[�ܙYY[�Έ	��b��j��b��o���	��cx�x�a�࢈y�+	�	�����8����-�
+L��"9�-9�%�हb!����"I��	��e8�o���H9i)��ex�f;�$I�	�ah�9i)��ex�f;�$I�	��e����a�ࡈ9l#��ex�f;�$I��	�� ���9l#��ex�f0�I�	��ox�a8ࢸ�e8�o�9l#��ex�f;�$I�	�hjH9l$x�!{�"8࠸�o��*;�"IK��\Έ	��cx�x�a�ࢸह�,9b!�ࢸ�j��e��i�hjyl$x�!x�i�࠸�o�� Myb!��b��a8�g��y�-9�%�स�e��h��b�ࢹ�g�����	��b��j��b��o�ऺh���nx�8�fx�a9i)��cx�ex�j��n��d8�fI��	��e8�o���x���ah�����e����a�ࡸ���� ���स�8�c�����g9d"8���f��i���x��8���������8ह/g8����	��b��j��b��o�����cx�x�a�ࢸ�������8���स��8੸����j�aix�8� x��x��8���������8�i�d�8�b8����	�fj8�j����ࢸ� y�ox�a8ࢸ�e8�o�ह�h��x�e��i�k�9�$	K���\Έ	�a��%-yn���i��$��$9b!��n��jya���8�fx�j9dl��c9����o��d��8�k��e��h��b�ࢹ�g����k��e����b�ࢸ�k��e����b�ࢸ�k��e����b�ࢺh���'��k�����8�i��f{� I��ܙX]Y]�M�
+�M�L��K�Y�	؝Z[[�ۚZ�Z�Y�I���[YN�	� �x�f8���c	�[[ښN�	�'�l���]Y�ܞN�	�d�:h����[YN�	�9b!���\��[��Έ	�9.��b!���Y�Έ��k���j��	�/g8ࢹ�k��cI�	�a�#�	�K�[�ܙYY[�Έ���f8���c8�a8ࠈ�`"��	��f�%�9b!�ࢺ �HML��	��x�kx�c�y`"��	�.��c��y�+	�	�a�9��H9i)��ex�f��	��o�ࢸ��9i)��ex�f��	�� ���9i)��ex�f��K��\Έ��a�#�8ऺh���nx�8�fx�a9i)��cx�ex�j�b!����	�cb��j���xह�x�e�� z �x�j:a�#�8हस�x���	��-8हb�8�b8�i��k�����i��g��xਸ��हc����	�*��dl���xहb�8�b8�i�$/x�e�$��स�e��i��9b!��k����K���\Έ	�a���x���j8�cx�j�dl��c9����o��d��8�k��e��h��b�ࢸ�8�k��e��h8�8� ���ܙX]Y]�M�
+�L��K�Y�	؝Z[[��\��X�X]I���[YN�	���x�x����8ਸ��x���ਸ��8���[[ښN�	�'�gI��]Y�ܞN�	��"�h����[YN�	̌9b!���\��[��Έ	̹.��b!���Y�Έ���(ycf	�	��x��8��8��I�K�[�ܙYY[�Έ����x�x�����	���8����9�-�y�-��	��j����j��c���a��	�e$:/��kdy�+	�	�સ����8��સ�8���9i)��ex�f��	�hjx��� �y�$�:`jza���K��\Έ���j����j��c��j9e$:/��kd8ह��x�i�स�x���	���8����9�-�हb�8�b8�i�L9b!��k�*l8�x���	���x�x��ऺ#.x�i��i��x��8�x�j9�hx�x���K���\Έ	�ࡸ�i��`xस�x��8�x�j�b�8�b8���j9.l�c%��e��8�ex�a8� ���ܙX]Y]�M�
+�
+��K�Y�	؝Z[[�ؘ[�[�I���[YN�	���8������x੸�����x�x��8�I�[[ښN�	�'�c	��]Y�ܞN�	��b��8�i8����x�8��8��	��[YN�	͌9b!���\��[��Έ	�9b!��	��Y�Έ���b�#��kd	�	��/8�cz#��kd	�K�[�ܙYY[�Έ��k�9����8������+	�	�%�9b���HML��	�� �����	�cmH�`"��	���8������	���x��8�x����8��x੸��8��9l#��ex�f;�$I�K��\Έ����8����8�j9� ���स�8�c�����g8���	�teps: ['バターと砂糖をよく混ぜる', '卵を１個ずつ加えて混ぜる', 'つぶしたバナナを加える', '粉類を振るいながら折り込む', '170℃で４０分焼く'],
+      notes: '完全に冷めてから切ると綺麗に切れる。',
+      createdAt: 1746720000000
     }
   ];
 }
 
-function loadData() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      recipes = JSON.parse(raw);
-      // 新しい組み込みレシピをマージ（まだ追加されていないものだけ）
-      const savedBuiltins = JSON.parse(localStorage.getItem(BUILTIN_KEY) || '[]');
-      const builtins = getBuiltinRecipes();
-      const existingIds = new Set(recipes.map(r => r.id));
-      const toAdd = builtins.filter(b => !savedBuiltins.includes(b.id) && !existingIds.has(b.id));
-      if (toAdd.length) {
-        recipes = [...toAdd, ...recipes];
-        saveData();
+// ==================== FIRESTORE ====================
+function showLoading() {
+  document.getElementById('grid').innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><p>レシピを読み込み中…</p></div>';
+  document.getElementById('recipeCount').textContent = '';
+}
+
+function initFirestore() {
+  showLoading();
+  recipesCol.orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+    recipes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    if (!initDone) {
+      initDone = true;
+      if (recipes.length === 0) {
+        seedBuiltinRecipes();
+        return;
       }
     }
-  } catch(e) { recipes = []; }
-  if (!recipes.length) {
-    recipes = getBuiltinRecipes();
-    saveData();
-  }
+    renderCards();
+  }, err => {
+    console.error('Firestore error:', err);
+    document.getElementById('grid').innerHTML =
+      '<div class="empty-state"><div class="empty-icon">⚠️</div><p>読み込みに失敗しました。<br>インターネット接続を確認してください。</p></div>';
+  });
 }
-function saveData() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes));
-  localStorage.setItem(BUILTIN_KEY, JSON.stringify(getBuiltinRecipes().map(b => b.id)));
-}
-function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
 
-function getSampleRecipes() { return getBuiltinRecipes(); }
+async function seedBuiltinRecipes() {
+  const batch = db.batch();
+  getBuiltinRecipes().forEach(r => batch.set(recipesCol.doc(r.id), r));
+  await batch.commit();
+}
+
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
 
 // ==================== RENDER ====================
 function getFiltered() {
@@ -680,7 +627,7 @@ function renderCards() {
   const list = getFiltered();
   const grid = document.getElementById('grid');
   document.getElementById('recipeCount').textContent =
-    `${recipes.length} 件のレシピ` + (list.length !== recipes.length ? `（${list.length} 件表示中）` : '');
+    `${recipes.length} 件のレシピ` + (list.length !== recipes.length ? `（${list.length} $��表示中）` : '');
   if (!list.length) {
     grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🥄</div><p>${recipes.length ? '条件に一致するレシピがありません' : 'まだレシピがありません。追加してみましょう！'}</p></div>`;
     return;
@@ -785,7 +732,7 @@ function addIngredient(val='') {
   const list = document.getElementById('ingredientList');
   const div = document.createElement('div');
   div.className='dyn-item';
-  div.innerHTML=`<input type="text" placeholder="例：じゃがいも 2個" value="${esc(val)}" /><button class="btn-remove-item" onclick="this.parentElement.remove()">✕</button>`;
+  div.innerHTML<`<input type="text" placeholder="例：じゃがいも 2個" value="${esc(val)}" /><button class="btn-remove-item" onclick="this.parentElement.remove()">✕</button>`;
   list.appendChild(div);
 }
 
@@ -806,26 +753,34 @@ function removeStep(btn) {
   });
 }
 
-function saveRecipe() {
+async function saveRecipe() {
   const name = document.getElementById('fName').value.trim();
   if (!name) { alert('料理名を入力してください'); return; }
   const ingredients = [...document.getElementById('ingredientList').querySelectorAll('input')].map(i=>i.value.trim()).filter(Boolean);
   const steps = [...document.getElementById('stepList').querySelectorAll('input')].map(i=>i.value.trim()).filter(Boolean);
   const tags = document.getElementById('fTags').value.split(',').map(t=>t.trim()).filter(Boolean);
-  const data = {
-    name, emoji: document.getElementById('fEmoji').value.trim()||'🍽️',
+  const existing = editingId ? recipes.find(r=>r.id===editingId) : null;
+  const recipeData = {
+    id: editingId || genId(),
+    name,
+    emoji: document.getElementById('fEmoji').value.trim() || '🍽️',
     category: document.getElementById('fCategory').value,
     time: document.getElementById('fTime').value.trim(),
     servings: document.getElementById('fServings').value.trim(),
-    tags, ingredients, steps, notes: document.getElementById('fNotes').value.trim()
+    tags, ingredients, steps,
+    notes: document.getElementById('fNotes').value.trim(),
+    createdAt: existing?.createdAt || Date.now()
   };
-  if (editingId) {
-    const idx = recipes.findIndex(r=>r.id===editingId);
-    if (idx>=0) recipes[idx] = {...recipes[idx], ...data};
-  } else {
-    recipes.unshift({id: genId(), createdAt: Date.now(), ...data});
+  const btn = document.querySelector('.btn-save');
+  btn.disabled = true; btn.textContent = '保存中…';
+  try {
+    await recipesCol.doc(recipeData.id).set(recipeData);
+    closeFormModal();
+  } catch(e) {
+    alert('保存に失敗しました。通信を確認してください。');
+  } finally {
+    btn.disabled = false; btn.textContent = '保存する';
   }
-  saveData(); closeFormModal(); renderCards();
 }
 function closeFormModal() { document.getElementById('formBackdrop').classList.remove('open'); }
 
@@ -837,10 +792,17 @@ function askDelete(id) {
   document.getElementById('confirmBackdrop').classList.add('open');
 }
 function closeConfirm() { document.getElementById('confirmBackdrop').classList.remove('open'); deletingId=null; }
-function confirmDelete() {
+async function confirmDelete() {
   if (!deletingId) return;
-  recipes = recipes.filter(r=>r.id!==deletingId);
-  saveData(); closeConfirm(); renderCards();
+  const btn = document.querySelector('.btn-confirm-del');
+  btn.disabled = true; btn.textContent = '削除中…';
+  try {
+    await recipesCol.doc(deletingId).delete();
+    closeConfirm();
+  } catch(e) {
+    alert('削除に失敗しました。通信を確認してください。');
+    btn.disabled = false; btn.textContent = '削除する';
+  }
 }
 
 // ==================== UTILS ====================
@@ -858,7 +820,7 @@ function esc(str) {
 });
 
 // ==================== INIT ====================
-loadData(); renderCards();
+initFirestore();
 </script>
 </body>
 </html>
