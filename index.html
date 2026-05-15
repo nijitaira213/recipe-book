@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="ãã¤ã¬ã·ãå¸³" />
+  <meta name="apple-mobile-web-app-title" content="マイレシピ帳" />
   <meta name="theme-color" content="#c87941" />
-  <title>ð³ ãã¤ã¬ã·ãå¸³</title>
+  <title>🍳 マイレシピ帳</title>
   <style>
     :root {
       --bg: #fdf6ee;
@@ -454,89 +454,89 @@
 
 <header>
   <div>
-    <h1>ð³ ãã¤ã¬ã·ãå¸³</h1>
-    <div class="subtitle">ä½ããæçãã¾ã¨ããã</div>
+    <h1>🍳 マイレシピ帳</h1>
+    <div class="subtitle">作れる料理をまとめよう</div>
   </div>
 </header>
 
 <div class="container">
   <div class="toolbar">
     <div class="search-wrap">
-      <span class="search-icon">ð</span>
-      <input type="search" id="searchInput" placeholder="ã¬ã·ãåã»ææã»ã¿ã°ã§æ¤ç´¢â¦" oninput="renderCards()" autocomplete="off" />
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="レシピ名・材料・タグで検索…" oninput="renderCards()" autocomplete="off" />
     </div>
     <select class="filter-select" id="categoryFilter" onchange="renderCards()">
-      <option value="">ãã¹ã¦</option>
+      <option value="">すべて</option>
     </select>
-    <button class="btn-add-desktop" onclick="openAddModal()">ï¼ ã¬ã·ããè¿½å </button>
+    <button class="btn-add-desktop" onclick="openAddModal()">＋ レシピを追加</button>
   </div>
   <div class="recipe-count" id="recipeCount"></div>
   <div class="grid" id="grid"></div>
 </div>
 
 <!-- FAB -->
-<button class="btn-add-fab" onclick="openAddModal()" aria-label="ã¬ã·ããè¿½å ">ï¼</button>
+<button class="btn-add-fab" onclick="openAddModal()" aria-label="レシピを追加">＋</button>
 
 <!-- ADD/EDIT MODAL -->
 <div class="backdrop" id="formBackdrop">
   <div class="modal">
     <div class="modal-handle"></div>
-    <button class="modal-close" onclick="closeFormModal()">â</button>
-    <h2 id="formTitle">æ°ããã¬ã·ããè¿½å </h2>
+    <button class="modal-close" onclick="closeFormModal()">✕</button>
+    <h2 id="formTitle">新しいレシピを追加</h2>
     <div class="form-row">
       <div class="form-group" style="flex:0 0 74px">
-        <label>çµµæå­</label>
-        <input type="text" id="fEmoji" placeholder="ð" maxlength="2" inputmode="text" />
+        <label>絵文字</label>
+        <input type="text" id="fEmoji" placeholder="🍜" maxlength="2" inputmode="text" />
       </div>
       <div class="form-group">
-        <label>æçå <span style="color:var(--danger)">*</span></label>
-        <input type="text" id="fName" placeholder="ä¾ï¼èããã" />
+        <label>料理名 <span style="color:var(--danger)">*</span></label>
+        <input type="text" id="fName" placeholder="例：肉じゃが" />
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label>ã«ãã´ãª</label>
+        <label>カテゴリ</label>
         <select id="fCategory">
-          <option value="åé£">åé£</option>
-          <option value="æ´é£">æ´é£</option>
-          <option value="ä¸­è¯">ä¸­è¯</option>
-          <option value="ã¢ã¸ã¢æç">ã¢ã¸ã¢æç</option>
-          <option value="ããã¤ã»ã¹ã¤ã¼ã">ããã¤ã»ã¹ã¤ã¼ã</option>
-          <option value="ãµã©ã">ãµã©ã</option>
-          <option value="ã¹ã¼ã">ã¹ã¼ã</option>
-          <option value="ãã®ä»">ãã®ä»</option>
+          <option value="和食">和食</option>
+          <option value="洋食">洋食</option>
+          <option value="中華">中華</option>
+          <option value="アジア料理">アジア料理</option>
+          <option value="おやつ・スイーツ">おやつ・スイーツ</option>
+          <option value="サラダ">サラダ</option>
+          <option value="スープ">スープ</option>
+          <option value="その他">その他</option>
         </select>
       </div>
       <div class="form-group">
-        <label>èª¿çæé</label>
-        <input type="text" id="fTime" placeholder="ä¾ï¼30å" inputmode="text" />
+        <label>調理時間</label>
+        <input type="text" id="fTime" placeholder="例：30分" inputmode="text" />
       </div>
     </div>
     <div class="form-group">
-      <label>äººæ°</label>
-      <input type="text" id="fServings" placeholder="ä¾ï¼2äººå" inputmode="text" />
+      <label>人数</label>
+      <input type="text" id="fServings" placeholder="例：2人分" inputmode="text" />
     </div>
     <div class="form-group">
-      <label>ã¿ã°ï¼ã«ã³ãåºåãï¼</label>
-      <input type="text" id="fTags" placeholder="ä¾ï¼ç°¡å, éè, ä½ãç½®ã" />
+      <label>タグ（カンマ区切り）</label>
+      <input type="text" id="fTags" placeholder="例：簡単, 野菜, 作り置き" />
     </div>
     <div class="form-group">
-      <label>ææ</label>
+      <label>材料</label>
       <div class="dyn-list" id="ingredientList"></div>
-      <button class="btn-add-item" onclick="addIngredient()">ï¼ ææãè¿½å </button>
+      <button class="btn-add-item" onclick="addIngredient()">＋ 材料を追加</button>
     </div>
     <div class="form-group">
-      <label>ä½ãæ¹</label>
+      <label>作り方</label>
       <div class="dyn-list" id="stepList"></div>
-      <button class="btn-add-item" onclick="addStep()">ï¼ æé ãè¿½å </button>
+      <button class="btn-add-item" onclick="addStep()">＋ 手順を追加</button>
     </div>
     <div class="form-group">
-      <label>ã¡ã¢ã»ãã¤ã³ã</label>
-      <textarea id="fNotes" placeholder="ã³ããä¿å­æ¹æ³ãªã©â¦"></textarea>
+      <label>メモ・ポイント</label>
+      <textarea id="fNotes" placeholder="コツや保存方法など…"></textarea>
     </div>
     <div class="form-actions">
-      <button class="btn-cancel" onclick="closeFormModal()">ã­ã£ã³ã»ã«</button>
-      <button class="btn-save" onclick="saveRecipe()">ä¿å­ãã</button>
+      <button class="btn-cancel" onclick="closeFormModal()">キャンセル</button>
+      <button class="btn-save" onclick="saveRecipe()">保存する</button>
     </div>
   </div>
 </div>
@@ -550,11 +550,11 @@
 <div class="backdrop" id="confirmBackdrop">
   <div class="modal confirm-modal" style="max-width:360px">
     <div class="modal-handle"></div>
-    <h2>ðï¸ ã¬ã·ããåé¤</h2>
-    <p>ã<span id="confirmName"></span>ãã<br>åé¤ãã¦ãããã§ããï¼<br><small style="color:#aaa">ãã®æä½ã¯åã«æ»ãã¾ãã</small></p>
+    <h2>🗑️ レシピを削除</h2>
+    <p>「<span id="confirmName"></span>」を<br>削除してもよいですか？<br><small style="color:#aaa">この操作は元に戻せません</small></p>
     <div class="confirm-actions">
-      <button class="btn-cancel-confirm" onclick="closeConfirm()">ã­ã£ã³ã»ã«</button>
-      <button class="btn-confirm-del" onclick="confirmDelete()">åé¤ãã</button>
+      <button class="btn-cancel-confirm" onclick="closeConfirm()">キャンセル</button>
+      <button class="btn-confirm-del" onclick="confirmDelete()">削除する</button>
     </div>
   </div>
 </div>
@@ -587,53 +587,53 @@ function getBuiltinRecipes() {
   return [
     {
       id: 'builtin_kanimid',
-      name: 'ãã«ãã¾ã¨ããããã®ä¸­è¯ãµã©ã',
-      emoji: 'ð¥', category: 'ãµã©ã',
-      time: '10å', servings: '2äººå',
-      tags: ['ç°¡å', 'ä¸­è¯', 'ãã¿ã¤ã'],
+      name: 'かにかまときゅうりの中華サラダ',
+      emoji: '🥗', category: 'サラダ',
+      time: '10分', servings: '2人分',
+      tags: ['簡単', '中華', 'やみつき'],
       ingredients: [
-        'ãã«ãã¾ 80g', 'ãããã 1æ¬', 'ã³ã¼ã³ç¼¶ 50gï¼æ°´æ°ãåãï¼',
-        'ãã¾æ²¹ å¤§ããï¼', 'é¢ å¤§ããï¼', 'ãããã å°ããï¼',
-        'ç ç³ å°ããÂ½', 'ç½ãããã¾ å°ããï¼', 'å¡© å°ãï¼ãã¿ç¨ï¼'
+        'かにかま 80g', 'きゅうり 1本', 'コーン缶 50g（水気を切る）',
+        'ごま油 大さじ１', '酢 大さじ１', 'しょうゆ 小さじ１',
+        '砂糖 小さじ½', '白いりごま 小さじ１', '塩 少々（もみ用）'
       ],
       steps: [
-        'ãããããç´°åãã«ãã¦å¡©å°ãã§ãã¿ã5åããããæ°´æ°ããã£ããçµã',
-        'ãã«ãã¾ãé£ã¹ãããå¤§ããã«ã»ãã',
-        'ãã¾æ²¹ã»é¢ã»ããããã»ç ç³ãããæ··ãåããã¦ãã¬ãã·ã³ã°ãä½ã',
-        'ãã«ãã¾ã»ããããã»ã³ã¼ã³ããã¦ã«ã«å¥ãããã¬ãã·ã³ã°ã§åãã',
-        'å¨ã«çããç½ãããã¾ãæ£ããã¦å®æ'
+        'きゅうりを細切りにして塩少々でもみ、5分おいたら水気をしっかり絞る',
+        'かにかまを食べやすい大きさにほぐす',
+        'ごま油・酢・しょうゆ・砂糖をよく混ぜ合わせてドレッシングを作る',
+        'かにかま・きゅうり・コーンをボウルに入れ、ドレッシングで和える',
+        '器に盛り、白いりごまを散らして完成'
       ],
-      notes: 'å·èµåº«ã§ï¼ï¼åã»ã©å·ããã¨å³ããªããã§ããã«ç¾å³ãããªãã¾ããããããã®æ°´æ°ã¯ãã£ããçµãã®ãã·ã£ã­ã·ã£ã­é£æã®ã³ãã§ãï¼',
+      notes: '冷蔵庫で３０分ほなe��やすと味がなじんでさらに美味しくなります。きゅうりの水気はしっかり絞るのがシャキシャキ食感のコツです！',
       createdAt: 1746979200000
     },
     {
       id: 'builtin_nikujaga',
-      name: 'èããã', emoji: 'ð²', category: 'åé£',
-      time: '40å', servings: '4äººå',
-      tags: ['å®çª', 'ä½ãç½®ã', 'éè'],
-      ingredients: ['ããããã 3å', 'çèåãè 150g', 'çã­ã 1å', 'äººå 1æ¬', 'é¤æ²¹ å¤§ãã3', 'ã¿ãã å¤§ãã3', 'ç ç³ å¤§ãã2'],
-      steps: ['éèãé£ã¹ãããå¤§ããã«åã', 'éã«æ²¹ãç±ããèã¨éèãçãã', 'æ°´ãå ãã¦ç®ç«ã¦ããã¢ã¯ãåã', 'èª¿å³æãå ãã¦è½ãèããã¦20åç®ã'],
-      notes: 'å·ããã¨ãã«å³ãæã¿ããã®ã§ãä¸åº¦å·ã¾ãã¨ããç¾å³ããã',
+      name: '肉じゃが', emoji: '🍲', category: '和食',
+      time: '40分', servings: '4人分',
+      tags: ['定番', '作り置き', '野菜'],
+      ingredients: ['じゃがいも 3個', '牛薄切り肉 150g', '玉ねぎ 1個', '人参 1本', '醤油 大さじ3', 'みりん 大さじ3', '砂糖 大さじ2'],
+      steps: ['野菜を食べやすい大きさに切る', '鍋に油を熱し、肉と野菜を炒める', '水を加えて煮立てたらアクを取る', '調味料を加えて落し蓋をして20分煮る'],
+      notes: '冷めるときに味が染みこむので、一度冷ますとより美味しい。',
       createdAt: 1746892800000
     },
     {
       id: 'builtin_arrabiata',
-      name: 'ãã¹ã¿ã»ã¢ã©ãã¢ã¼ã¿', emoji: 'ð', category: 'æ´é£',
-      time: '20å', servings: '2äººå',
-      tags: ['ç°¡å', 'ã¹ãã¼ã'],
-      ingredients: ['ãã¹ã¿ 200g', 'ãããç¼¶ 1ç¼¶', 'ã«ãã«ã 2ç', 'åè¾å­ 1æ¬', 'ãªãªã¼ããªã¤ã« å¤§ãã2', 'å¡©ã»è¡æ¤ é©é'],
-      steps: ['ã«ãã«ãã¨åè¾å­ãæ²¹ã§çãã', 'ãããç¼¶ãå ãã¦10åç®è©°ãã', 'ãã¹ã¿ãè¹ã§ã¦ã½ã¼ã¹ã¨çµ¡ãã'],
-      notes: 'ãã§æ±ãã½ã¼ã¹ã«å ããã¨ä¹³åããããã',
+      name: 'パスタ・アラビアータ', emoji: '🍝', category: '洋食',
+      time: '20分', servings: '2人分',
+      tags: ['簡単', 'スピード'],
+      ingredients: ['パスタ 200g', 'トマト缶 1缶', 'にんにく 2片', '唐辛子 1本', 'オリーブオイル 大さじ2', '塩・胡椒 適量'],
+      steps: ['にんにくと唐辛子を油で炒める', 'トマト缶を加えて10分煮詰める', 'パスタを茹でてソースと絡める'],
+      notes: 'ゆで汁をソースに加えると乳化しやすい。',
       createdAt: 1746806400000
     },
     {
       id: 'builtin_banana',
-      name: 'ããããã¦ã³ãã±ã¼ã­', emoji: 'ð', category: 'ããã¤ã»ã¹ã¤ã¼ã',
-      time: '60å', servings: '8åã',
-      tags: ['ãèå­', 'ç¼ãèå­'],
-      ingredients: ['å®çããã 2æ¬', 'èåç² 150g', 'ç ç³ 80g', 'åµ 2å', 'ãã¿ã¼ 80g', 'ãã¼ã­ã³ã°ãã¦ãã¼ å°ããï¼'],
-      steps: ['ãã¿ã¼ã¨ç ç³ãããæ··ãã', 'åµãï¼åãã¤å ãã¦æ··ãã', 'ã¤ã¶ããããããå ãã', 'ç²é¡ãæ¯ãããªããæãè¾¼ã', '170âã§ï¼ï¼åç¼ã'],
-      notes: 'å®å¨ã«å·ãã¦ããåãã¨ç¶ºéºã«åããã',
+      name: 'バナナパウンドケーキ', emoji: '🍌', category: 'おやつ・スイーツ',
+      time: '60分', servings: '8切れ',
+      tags: ['お菓子', '焼き菓子'],
+      ingredients: ['完熟バナナ 2本', '薄力粉 150g', '砂糖 80g', '卵 2個', 'バター 80g', 'ベーキングパウダー 小さじ１'],
+      steps: ['バターと砂糖をよく混ぜる', '卵を１個ずつ加えて混ぜる', 'つぶしたバナナを加える', '粉類を振るいながら折り込む', '170℃で４０分焼く'],
+      notes: '完全に冷めてから切ると綺麗に切れる。',
       createdAt: 1746720000000
     }
   ];
@@ -641,7 +641,7 @@ function getBuiltinRecipes() {
 
 // ==================== FIRESTORE ====================
 function showLoading() {
-  document.getElementById('grid').innerHTML = '<div class="empty-state"><div class="empty-icon">â³</div><p>ã¬ã·ããèª­ã¿è¾¼ã¿ä¸­â¦</p></div>';
+  document.getElementById('grid').innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><p>レシピを読み込み中…</p></div>';
   document.getElementById('recipeCount').textContent = '';
 }
 
@@ -660,7 +660,7 @@ function initFirestore() {
   }, err => {
     console.error('Firestore error:', err);
     document.getElementById('grid').innerHTML =
-      '<div class="empty-state"><div class="empty-icon">â ï¸</div><p>èª­ã¿è¾¼ã¿ã«å¤±æãã¾ããã<br>ã¤ã³ã¿ã¼ãããæ¥ç¶ãç¢ºèªãã¦ãã ããã</p></div>';
+      '<div class="empty-state"><div class="empty-icon">⚠️</div><p>読み込みに失敗しました。<br>インターネット接続を確認してください。</p></div>';
   });
 }
 
@@ -688,7 +688,7 @@ function updateCategoryFilter() {
   const sel = document.getElementById('categoryFilter');
   const cur = sel.value;
   const cats = [...new Set(recipes.map(r=>r.category).filter(Boolean))].sort();
-  sel.innerHTML = '<option value="">ãã¹ã¦</option>' + cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  sel.innerHTML = '<option value="">すべて</option>' + cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
   if (cats.includes(cur)) sel.value = cur;
 }
 
@@ -697,24 +697,24 @@ function renderCards() {
   const list = getFiltered();
   const grid = document.getElementById('grid');
   document.getElementById('recipeCount').textContent =
-    `${recipes.length} ä»¶ã®ã¬ã·ã` + (list.length !== recipes.length ? `ï¼${list.length} ä»¶è¡¨ç¤ºä¸­ï¼` : '');
+    `${recipes.length} 件のレシピ` + (list.length !== recipes.length ? `（${list.length} 件表示中）` : '');
   if (!list.length) {
-    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">ð¥</div><p>${recipes.length ? 'æ¡ä»¶ã«ä¸è´ããã¬ã·ããããã¾ãã' : 'ã¾ã ã¬ã·ããããã¾ãããè¿½å ãã¦ã¿ã¾ãããï¼'}</p></div>`;
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🥄</div><p>${recipes.length ? '条件に一致するレシピがありません' : 'まだレシピがありません。追加してみましょう！'}</p></div>`;
     return;
   }
   grid.innerHTML = list.map(r => `
     <div class="card" onclick="openDetail('${r.id}')">
-      <div class="card-emoji">${esc(r.emoji||'ð½ï¸')}</div>
+      <div class="card-emoji">${esc(r.emoji||'🍽️')}</div>
       <div class="card-title">${esc(r.name)}</div>
-      <div><span class="card-category">${esc(r.category||'ãã®ä»')}</span></div>
+      <div><span class="card-category">${esc(r.category||'その他')}</span></div>
       ${r.tags?.length ? `<div class="card-tags">${r.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>` : ''}
       <div class="card-meta">
-        ${r.time ? `<span>â± ${esc(r.time)}</span>` : ''}
-        ${r.servings ? `<span>ð¥ ${esc(r.servings)}</span>` : ''}
+        ${r.time ? `<span>⏱ ${esc(r.time)}</span>` : ''}
+        ${r.servings ? `<span>👥 ${esc(r.servings)}</span>` : ''}
       </div>
       <div class="card-actions" onclick="event.stopPropagation()">
-        <button class="btn-icon" onclick="openEditModal('${r.id}')">âï¸ ç·¨é</button>
-        <button class="btn-icon danger" onclick="askDelete('${r.id}')">ðï¸</button>
+        <button class="btn-icon" onclick="openEditModal('${r.id}')">✏️ 編集</button>
+        <button class="btn-icon danger" onclick="askDelete('${r.id}')">🗑️</button>
       </div>
     </div>
   `).join('');
@@ -727,35 +727,35 @@ function openDetail(id) {
   const el = document.getElementById('detailContent');
   el.innerHTML = `
     <div class="modal-handle"></div>
-    <button class="modal-close" onclick="closeDetail()">â</button>
+    <button class="modal-close" onclick="closeDetail()">✕</button>
     <div class="detail-header">
-      <div class="detail-emoji">${esc(r.emoji||'ð½ï¸')}</div>
+      <div class="detail-emoji">${esc(r.emoji||'🍽️')}</div>
       <h2>${esc(r.name)}</h2>
       <div class="detail-meta">
-        <span class="card-category">${esc(r.category||'ãã®ä»')}</span>
-        ${r.time?`<span>â± ${esc(r.time)}</span>`:''}
-        ${r.servings?`<span>ð¥ ${esc(r.servings)}</span>`:''}
+        <span class="card-category">${esc(r.category||'その他')}</span>
+        ${r.time?`<span>⏱ ${esc(r.time)}</span>`:''}
+        ${r.servings?`<span>👥 ${esc(r.servings)}</span>`:''}
         ${r.tags?.length?r.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join(''):''}
       </div>
     </div>
     ${r.ingredients?.length?`
     <div class="detail-section">
-      <h3>ð ææ</h3>
+      <h3>🛒 材料</h3>
       <ul class="ingredient-list">${r.ingredients.filter(Boolean).map(i=>`<li>${esc(i)}</li>`).join('')}</ul>
     </div>`:''}
     ${r.steps?.length?`
     <div class="detail-section">
-      <h3>ð©âð³ ä½ãæ¹</h3>
+      <h3>👩‍🍳 作り方</h3>
       <ol class="step-list">${r.steps.filter(Boolean).map((s,i)=>`<li><span class="step-num">${i+1}</span><span>${esc(s)}</span></li>`).join('')}</ol>
     </div>`:''}
     ${r.notes?`
     <div class="detail-section">
-      <h3>ð ã¡ã¢ã»ãã¤ã³ã</h3>
+      <h3>📝 メモ・ポイント</h3>
       <div class="notes-box">${esc(r.notes)}</div>
     </div>`:''}
     <div class="detail-actions">
-      <button class="btn-edit" onclick="closeDetail();openEditModal('${r.id}')">âï¸ ç·¨éãã</button>
-      <button class="btn-delete" onclick="closeDetail();askDelete('${r.id}')">ðï¸ åé¤ãã</button>
+      <button class="btn-edit" onclick="closeDetail();openEditModal('${r.id}')">✏️ 編集する</button>
+      <button class="btn-delete" onclick="closeDetail();askDelete('${r.id}')">🗑️ 削除する</button>
     </div>
   `;
   document.getElementById('detailBackdrop').classList.add('open');
@@ -765,7 +765,7 @@ function closeDetail() { document.getElementById('detailBackdrop').classList.rem
 // ==================== FORM ====================
 function openAddModal() {
   editingId = null;
-  document.getElementById('formTitle').textContent = 'æ°ããã¬ã·ããè¿½å ';
+  document.getElementById('formTitle').textContent = '新しいレシピを追加';
   clearForm();
   addIngredient(); addIngredient(); addIngredient();
   addStep(); addStep();
@@ -777,11 +777,11 @@ function openEditModal(id) {
   const r = recipes.find(x=>x.id===id);
   if (!r) return;
   editingId = id;
-  document.getElementById('formTitle').textContent = 'ã¬ã·ããç·¨é';
+  document.getElementById('formTitle').textContent = 'レシピを編集';
   clearForm();
   document.getElementById('fEmoji').value = r.emoji||'';
   document.getElementById('fName').value = r.name||'';
-  document.getElementById('fCategory').value = r.category||'ãã®ä»';
+  document.getElementById('fCategory').value = r.category||'その他';
   document.getElementById('fTime').value = r.time||'';
   document.getElementById('fServings').value = r.servings||'';
   document.getElementById('fTags').value = (r.tags||[]).join(', ');
@@ -793,7 +793,7 @@ function openEditModal(id) {
 
 function clearForm() {
   ['fEmoji','fName','fTime','fServings','fTags','fNotes'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('fCategory').value='åé£';
+  document.getElementById('fCategory').value='和食';
   document.getElementById('ingredientList').innerHTML='';
   document.getElementById('stepList').innerHTML='';
 }
@@ -802,7 +802,7 @@ function addIngredient(val='') {
   const list = document.getElementById('ingredientList');
   const div = document.createElement('div');
   div.className='dyn-item';
-  div.innerHTML<`<input type="text" placeholder="ä¾ï¼ããããã 2å" value="${esc(val)}" /><button class="btn-remove-item" onclick="this.parentElement.remove()">â</button>`;
+  div.innerHTML<`<input type="text" placeholder="例：じゃがいも 2個" value="${esc(val)}" /><button class="btn-remove-item" onclick="this.parentElement.remove()">✕</button>`;
   list.appendChild(div);
 }
 
@@ -811,7 +811,7 @@ function addStep(val='') {
   const n = list.children.length+1;
   const div = document.createElement('div');
   div.className='dyn-item';
-  div.innerHTML=`<span style="flex-shrink:0;color:var(--accent-dark);font-size:0.8rem;font-weight:700;width:18px;text-align:center">${n}</span><input type="text" placeholder="æé  ${n}" value="${esc(val)}" /><button class="btn-remove-item" onclick="removeStep(this)">â</button>`;
+  div.innerHTML=`<span style="flex-shrink:0;color:var(--accent-dark);font-size:0.8rem;font-weight:700;width:18px;text-align:center">${n}</span><input type="text" placeholder="手順 ${n}" value="${esc(val)}" /><button class="btn-remove-item" onclick="removeStep(this)">✕</button>`;
   list.appendChild(div);
 }
 
@@ -819,13 +819,13 @@ function removeStep(btn) {
   btn.parentElement.remove();
   [...document.getElementById('stepList').children].forEach((item,i)=>{
     item.querySelector('span').textContent=i+1;
-    item.querySelector('input').placeholder=`æé  ${k+1}`;
+    item.querySelector('input').placeholder=`手順 ${i+1}`;
   });
 }
 
 async function saveRecipe() {
   const name = document.getElementById('fName').value.trim();
-  if (!name) { alert('æçåãå¥åãã¦ãã ãã'); return; }
+  if (!name) { alert('料理名を入力してください'); return; }
   const ingredients = [...document.getElementById('ingredientList').querySelectorAll('input')].map(i=>i.value.trim()).filter(Boolean);
   const steps = [...document.getElementById('stepList').querySelectorAll('input')].map(i=>i.value.trim()).filter(Boolean);
   const tags = document.getElementById('fTags').value.split(',').map(t=>t.trim()).filter(Boolean);
@@ -833,7 +833,7 @@ async function saveRecipe() {
   const recipeData = {
     id: editingId || genId(),
     name,
-    emoji: document.getElementById('fEmoji').value.trim() || 'ð½ï¸',
+    emoji: document.getElementById('fEmoji').value.trim() || '🍽️',
     category: document.getElementById('fCategory').value,
     time: document.getElementById('fTime').value.trim(),
     servings: document.getElementById('fServings').value.trim(),
@@ -842,14 +842,14 @@ async function saveRecipe() {
     createdAt: existing?.createdAt || Date.now()
   };
   const btn = document.querySelector('.btn-save');
-  btn.disabled = true; btn.textContent = 'ä¿å­ä¸­â¦';
+  btn.disabled = true; btn.textContent = '保存中…';
   try {
     await recipesCol.doc(recipeData.id).set(recipeData);
     closeFormModal();
   } catch(e) {
-    alert('ä¿å­ã«å¤±æãã¾ãããéä¿¡ãç¢ºèªãã¦ãã ããã');
+    alert('保存っつよら失敗しました。通信を確認してください。');
   } finally {
-    btn.disabled = false; btn.textContent = 'ä¿å­ãã';
+    btn.disabled = false; btn.textContent = '保存する';
   }
 }
 function closeFormModal() { document.getElementById('formBackdrop').classList.remove('open'); }
@@ -865,13 +865,13 @@ function closeConfirm() { document.getElementById('confirmBackdrop').classList.r
 async function confirmDelete() {
   if (!deletingId) return;
   const btn = document.querySelector('.btn-confirm-del');
-  btn.disabled = true; btn.textContent = 'åé¤ä¸­â¦';
+  btn.disabled = true; btn.textContent = '削除中…';
   try {
     await recipesCol.doc(deletingId).delete();
     closeConfirm();
   } catch(e) {
-    alert('åé¤ã«å¤±æãã¾ãããéä¿¡ãç¢ºèªãã¦ãã ããã');
-    btn.disabled = false; btn.textContent = 'åé¤ãã';
+    alert('削除に失敗しました。通信を確認してください。');
+    btn.disabled = false; btn.textContent = '削除する';
   }
 }
 
@@ -893,4 +893,3 @@ function esc(str) {
 initFirestore();
 </script>
 </body>
-</html>
