@@ -52,6 +52,24 @@
     }
     header h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: 0.04em; }
     header .subtitle { font-size: 0.75rem; opacity: 0.85; margin-top: 2px; }
+    .header-spacer { flex: 1; }
+    .btn-auth {
+      padding: 7px 13px;
+      border-radius: 20px;
+      border: 1.5px solid rgba(255,255,255,0.6);
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      font-size: 0.8rem;
+      cursor: pointer;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .btn-auth:hover { background: rgba(255,255,255,0.28); }
+    .btn-auth:active { background: rgba(255,255,255,0.1); }
 
     /* ===== LAYOUT ===== */
     .container {
@@ -457,6 +475,11 @@
     <h1>🍳 マイレシピ帳</h1>
     <div class="subtitle">作れる料理をまとめよう</div>
   </div>
+  <div class="header-spacer"></div>
+  <button class="btn-auth" id="authBtn" onclick="handleAuthClick()">
+    <span id="authBtnIcon">🔑</span>
+    <span id="authBtnLabel">ログイン</span>
+  </button>
 </header>
 
 <div class="container">
@@ -561,6 +584,7 @@
 
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 
 <script>
@@ -575,6 +599,7 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const auth = firebase.auth();
 const recipesCol = db.collection('recipes');
 
 // ==================== DATA ====================
@@ -582,6 +607,7 @@ let recipes = [];
 let editingId = null;
 let deletingId = null;
 let initDone = false;
+let currentUser = null;
 
 function getBuiltinRecipes() {
   return [
@@ -603,7 +629,7 @@ function getBuiltinRecipes() {
         'かにかま・きゅうり・コーンをボウルに入れ、ドレッシングで和える',
         '器に盛り、白いりごまを散らして完成'
       ],
-      notes: '冷蔵庫で３０分ほなe��やすと味がなじんでさらに美味しくなります。きゅうりの水気はしっかり絞るのがシャキシャキ食感のコツです！',
+      notes: '冷蔵庫で３０分ほど冷やすと味がなじんでさらに美味しくなります。きゅうりの水気はしっかり絞るのがシャキシャキ食感のコツです！',
       createdAt: 1746979200000
     },
     {
@@ -712,10 +738,11 @@ function renderCards() {
         ${r.time ? `<span>⏱ ${esc(r.time)}</span>` : ''}
         ${r.servings ? `<span>👥 ${esc(r.servings)}</span>` : ''}
       </div>
+      ${currentUser ? `
       <div class="card-actions" onclick="event.stopPropagation()">
         <button class="btn-icon" onclick="openEditModal('${r.id}')">✏️ 編集</button>
         <button class="btn-icon danger" onclick="askDelete('${r.id}')">🗑️</button>
-      </div>
+      </div>` : ''}
     </div>
   `).join('');
 }
@@ -753,10 +780,11 @@ function openDetail(id) {
       <h3>📝 メモ・ポイント</h3>
       <div class="notes-box">${esc(r.notes)}</div>
     </div>`:''}
+    ${currentUser ? `
     <div class="detail-actions">
       <button class="btn-edit" onclick="closeDetail();openEditModal('${r.id}')">✏️ 編集する</button>
       <button class="btn-delete" onclick="closeDetail();askDelete('${r.id}')">🗑️ 削除する</button>
-    </div>
+    </div>` : ''}
   `;
   document.getElementById('detailBackdrop').classList.add('open');
 }
@@ -802,7 +830,7 @@ function addIngredient(val='') {
   const list = document.getElementById('ingredientList');
   const div = document.createElement('div');
   div.className='dyn-item';
-  div.innerHTML<`<input type="text" placeholder="例：じゃがいも 2個" value="${esc(val)}" /><button class="btn-remove-item" onclick="this.parentElement.remove()">✕</button>`;
+  div.innerHTML=`<input type="text" placeholder="例：じゃがいも 2個" value="${esc(val)}" /><button class="btn-remove-item" onclick="this.parentElement.remove()">✕</button>`;
   list.appendChild(div);
 }
 
@@ -847,7 +875,7 @@ async function saveRecipe() {
     await recipesCol.doc(recipeData.id).set(recipeData);
     closeFormModal();
   } catch(e) {
-    alert('保存っつよら失敗しました。通信を確認してください。');
+    alert('保存に失敗しました。通信を確認してください。');
   } finally {
     btn.disabled = false; btn.textContent = '保存する';
   }
@@ -889,7 +917,40 @@ function esc(str) {
   });
 });
 
+// ==================== AUTH ====================
+function handleAuthClick() {
+  if (currentUser) {
+    auth.signOut();
+  } else {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider).catch(err => {
+      if (err.code !== 'auth/popup-closed-by-user') {
+        alert('ログインに失敗しました。');
+      }
+    });
+  }
+}
+
+function applyAuthUI(user) {
+  const loggedIn = !!user;
+  document.getElementById('authBtnIcon').textContent = loggedIn ? '👤' : '🔑';
+  document.getElementById('authBtnLabel').textContent = loggedIn ? 'ログアウト' : 'ログイン';
+
+  const addDesktop = document.querySelector('.btn-add-desktop');
+  const addFab = document.querySelector('.btn-add-fab');
+  if (addDesktop) addDesktop.style.display = loggedIn ? '' : 'none';
+  if (addFab) addFab.style.display = loggedIn ? '' : 'none';
+
+  renderCards();
+}
+
+auth.onAuthStateChanged(user => {
+  currentUser = user;
+  applyAuthUI(user);
+});
+
 // ==================== INIT ====================
 initFirestore();
 </script>
 </body>
+</html>
