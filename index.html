@@ -53,21 +53,7 @@
     header h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: 0.04em; }
     header .subtitle { font-size: 0.75rem; opacity: 0.85; margin-top: 2px; }
     .header-spacer { flex: 1; }
-    .btn-auth {
-      padding: 7px 13px;
-      border-radius: 20px;
-      border: 1.5px solid rgba(255,255,255,0.6);
-      background: rgba(255,255,255,0.15);
-      color: #fff;
-      font-size: 0.8rem;
-      cursor: pointer;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      transition: background 0.2s;
-      flex-shrink: 0;
-    }
+    
     .btn-auth:hover { background: rgba(255,255,255,0.28); }
     .btn-auth:active { background: rgba(255,255,255,0.1); }
 
@@ -476,10 +462,7 @@
     <div class="subtitle">作れる料理をまとめよう</div>
   </div>
   <div class="header-spacer"></div>
-  <button class="btn-auth" id="authBtn" onclick="handleAuthClick()">
-    <span id="authBtnIcon">🔑</span>
-    <span id="authBtnLabel">ログイン</span>
-  </button>
+  
 </header>
 
 <div class="container">
@@ -918,23 +901,9 @@ function esc(str) {
 });
 
 // ==================== AUTH ====================
-function handleAuthClick() {
-  if (currentUser) {
-    auth.signOut();
-  } else {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider).catch(err => {
-      if (err.code !== 'auth/popup-closed-by-user') {
-        alert('ログインに失敗しました。');
-      }
-    });
-  }
-}
 
 function applyAuthUI(user) {
   const loggedIn = !!user;
-  document.getElementById('authBtnIcon').textContent = loggedIn ? '👤' : '🔑';
-  document.getElementById('authBtnLabel').textContent = loggedIn ? 'ログアウト' : 'ログイン';
 
   const addDesktop = document.querySelector('.btn-add-desktop');
   const addFab = document.querySelector('.btn-add-fab');
