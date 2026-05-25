@@ -10,429 +10,95 @@
   <title>🍳 マイレシピ帳</title>
   <style>
     :root {
-      --bg: #fdf6ee;
-      --surface: #fff9f2;
-      --surface2: #f5ece0;
-      --border: #e0cbb5;
-      --accent: #c87941;
-      --accent-dark: #a0602e;
-      --accent-light: #f0d9c0;
-      --text: #3d2b1a;
-      --text-sub: #8a6a4e;
-      --tag-bg: #e8d5bc;
-      --tag-text: #7a5230;
-      --danger: #c0392b;
-      --shadow: rgba(100,60,20,0.10);
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --bg: #fdf6ee; --surface: #fff9f2; --surface2: #f5ece0;
+      --border: #e0cbb5; --accent: #c87941; --accent-dark: #a0602e;
+      --accent-light: #f0d9c0; --text: #3d2b1a; --text-sub: #8a6a4e;
+      --tag-bg: #e8d5bc; --tag-text: #7a5230; --danger: #c0392b;
+      --shadow: rgba(100,60,20,0.10); --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html { font-size: 16px; }
-    body {
-      font-family: -apple-system, 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      min-height: 100dvh;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* ===== HEADER ===== */
-    header {
-      background: var(--accent);
-      color: #fff;
-      padding: 16px 20px;
-      padding-top: calc(16px + env(safe-area-inset-top, 0px));
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      box-shadow: 0 2px 8px var(--shadow);
-      position: sticky;
-      top: 0;
-      z-index: 50;
-    }
+    body { font-family: -apple-system, 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; min-height: 100dvh; -webkit-font-smoothing: antialiased; }
+    header { background: var(--accent); color: #fff; padding: 16px 20px; padding-top: calc(16px + env(safe-area-inset-top, 0px)); display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px var(--shadow); position: sticky; top: 0; z-index: 50; }
     header h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: 0.04em; }
     header .subtitle { font-size: 0.75rem; opacity: 0.85; margin-top: 2px; }
-    .header-spacer { flex: 1; }
-    
-    .btn-auth:hover { background: rgba(255,255,255,0.28); }
-    .btn-auth:active { background: rgba(255,255,255,0.1); }
-
-    /* ===== LAYOUT ===== */
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 20px 16px;
-      padding-bottom: calc(80px + var(--safe-bottom));
-    }
-
-    /* ===== TOOLBAR ===== */
-    .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 16px;
-      align-items: center;
-    }
-    .search-wrap {
-      flex: 1;
-      min-width: 160px;
-      position: relative;
-    }
-    .search-wrap input {
-      width: 100%;
-      padding: 11px 14px 11px 38px;
-      border: 1.5px solid var(--border);
-      border-radius: 24px;
-      background: var(--surface);
-      font-size: 1rem;
-      color: var(--text);
-      outline: none;
-      -webkit-appearance: none;
-      appearance: none;
-    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 20px 16px; padding-bottom: calc(80px + var(--safe-bottom)); }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; align-items: center; }
+    .search-wrap { flex: 1; min-width: 160px; position: relative; }
+    .search-wrap input { width: 100%; padding: 11px 14px 11px 38px; border: 1.5px solid var(--border); border-radius: 24px; background: var(--surface); font-size: 1rem; color: var(--text); outline: none; -webkit-appearance: none; appearance: none; }
     .search-wrap input:focus { border-color: var(--accent); }
-    .search-wrap .search-icon {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 1rem;
-      pointer-events: none;
-    }
-    .filter-select {
-      padding: 11px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 24px;
-      background: var(--surface);
-      font-size: 0.9rem;
-      color: var(--text);
-      cursor: pointer;
-      outline: none;
-      -webkit-appearance: none;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238a6a4e' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      padding-right: 30px;
-    }
-
-    /* ===== FAB (Add button on mobile) ===== */
-    .btn-add-fab {
-      display: none;
-      position: fixed;
-      bottom: calc(20px + var(--safe-bottom));
-      right: 20px;
-      width: 56px;
-      height: 56px;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 50%;
-      font-size: 1.6rem;
-      line-height: 1;
-      cursor: pointer;
-      box-shadow: 0 4px 16px rgba(100,60,20,0.35);
-      z-index: 49;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s, transform 0.15s;
-    }
+    .search-wrap .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 1rem; pointer-events: none; }
+    .filter-select { padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 24px; background: var(--surface); font-size: 0.9rem; color: var(--text); cursor: pointer; outline: none; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238a6a4e' d='M6 8L0 0h12z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 30px; }
+    .btn-add-fab { display: none; position: fixed; bottom: calc(20px + var(--safe-bottom)); right: 20px; width: 56px; height: 56px; background: var(--accent); color: #fff; border: none; border-radius: 50%; font-size: 1.6rem; cursor: pointer; box-shadow: 0 4px 16px rgba(100,60,20,0.35); z-index: 49; align-items: center; justify-content: center; transition: background 0.2s, transform 0.15s; }
     .btn-add-fab:active { transform: scale(0.92); background: var(--accent-dark); }
-    .btn-add-desktop {
-      padding: 11px 20px;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 24px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background 0.2s;
-    }
+    .btn-add-desktop { padding: 11px 20px; background: var(--accent); color: #fff; border: none; border-radius: 24px; font-size: 0.95rem; font-weight: 700; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
     .btn-add-desktop:hover { background: var(--accent-dark); }
-
-    /* ===== RECIPE COUNT ===== */
-    .recipe-count {
-      font-size: 0.82rem;
-      color: var(--text-sub);
-      margin-bottom: 14px;
-    }
-
-    /* ===== GRID ===== */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 14px;
-    }
-    .empty-state {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--text-sub);
-    }
+    .recipe-count { font-size: 0.82rem; color: var(--text-sub); margin-bottom: 14px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+    .empty-state { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-sub); }
     .empty-state .empty-icon { font-size: 3rem; margin-bottom: 12px; }
-
-    /* ===== CARD ===== */
-    .card {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
-      cursor: pointer;
-      transition: box-shadow 0.2s, transform 0.15s;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      -webkit-user-select: none;
-      user-select: none;
-    }
+    .card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; padding: 16px; cursor: pointer; transition: box-shadow 0.2s, transform 0.15s; display: flex; flex-direction: column; gap: 8px; -webkit-user-select: none; user-select: none; }
     .card:active { transform: scale(0.98); }
     @media (hover: hover) { .card:hover { box-shadow: 0 6px 20px var(--shadow); transform: translateY(-2px); } }
     .card-emoji { font-size: 1.8rem; line-height: 1; }
     .card-title { font-size: 1rem; font-weight: 700; }
-    .card-category {
-      display: inline-block;
-      background: var(--accent-light);
-      color: var(--accent-dark);
-      font-size: 0.72rem;
-      font-weight: 600;
-      padding: 3px 10px;
-      border-radius: 12px;
-    }
+    .card-category { display: inline-block; background: var(--accent-light); color: var(--accent-dark); font-size: 0.72rem; font-weight: 600; padding: 3px 10px; border-radius: 12px; }
     .card-tags { display: flex; flex-wrap: wrap; gap: 5px; }
-    .tag {
-      background: var(--tag-bg);
-      color: var(--tag-text);
-      font-size: 0.7rem;
-      padding: 2px 8px;
-      border-radius: 10px;
-    }
+    .tag { background: var(--tag-bg); color: var(--tag-text); font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; }
     .card-meta { font-size: 0.76rem; color: var(--text-sub); display: flex; gap: 10px; }
     .card-actions { display: flex; gap: 8px; margin-top: auto; }
-    .btn-icon {
-      padding: 7px 12px;
-      font-size: 0.82rem;
-      border-radius: 10px;
-      border: 1.5px solid var(--border);
-      background: var(--surface2);
-      cursor: pointer;
-      color: var(--text);
-      min-height: 36px;
-    }
+    .btn-icon { padding: 7px 12px; font-size: 0.82rem; border-radius: 10px; border: 1.5px solid var(--border); background: var(--surface2); cursor: pointer; color: var(--text); min-height: 36px; }
     .btn-icon.danger:hover { background: #fde8e8; border-color: #e0a0a0; color: var(--danger); }
-
-    /* ===== MODAL BACKDROP ===== */
-    .backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(60,30,10,0.45);
-      z-index: 100;
-      justify-content: flex-end;
-      align-items: flex-end;
-    }
+    .backdrop { display: none; position: fixed; inset: 0; background: rgba(60,30,10,0.45); z-index: 100; justify-content: flex-end; align-items: flex-end; }
     .backdrop.open { display: flex; }
-
-    /* ===== MODAL (bottom sheet on mobile) ===== */
-    .modal {
-      background: var(--surface);
-      width: 100%;
-      max-height: 92dvh;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      border-radius: 20px 20px 0 0;
-      padding: 20px 20px calc(20px + var(--safe-bottom));
-      position: relative;
-      animation: slideUp 0.28s cubic-bezier(.4,0,.2,1);
-    }
+    .modal { background: var(--surface); width: 100%; max-height: 92dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; border-radius: 20px 20px 0 0; padding: 20px 20px calc(20px + var(--safe-bottom)); position: relative; animation: slideUp 0.28s cubic-bezier(.4,0,.2,1); }
     @keyframes slideUp { from { transform: translateY(60px); opacity: 0; } to { transform: none; opacity: 1; } }
-    .modal-handle {
-      width: 40px; height: 4px;
-      background: var(--border);
-      border-radius: 2px;
-      margin: 0 auto 16px;
-    }
+    .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
     .modal h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 18px; color: var(--accent-dark); }
-    .modal-close {
-      position: absolute;
-      top: 16px; right: 16px;
-      background: var(--surface2);
-      border: none;
-      width: 32px; height: 32px;
-      border-radius: 50%;
-      font-size: 1rem;
-      cursor: pointer;
-      color: var(--text-sub);
-      display: flex; align-items: center; justify-content: center;
-    }
-
-    /* ===== FORM ===== */
+    .modal-close { position: absolute; top: 16px; right: 16px; background: var(--surface2); border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 1rem; cursor: pointer; color: var(--text-sub); display: flex; align-items: center; justify-content: center; }
     .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
     .form-group label { font-size: 0.82rem; font-weight: 600; color: var(--text-sub); }
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      padding: 12px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      background: var(--bg);
-      font-size: 1rem;
-      color: var(--text);
-      outline: none;
-      font-family: inherit;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus { border-color: var(--accent); }
+    .form-group input, .form-group select, .form-group textarea { padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px; background: var(--bg); font-size: 1rem; color: var(--text); outline: none; font-family: inherit; -webkit-appearance: none; appearance: none; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
     .form-group textarea { resize: vertical; min-height: 80px; }
     .form-row { display: flex; gap: 10px; }
     .form-row .form-group { flex: 1; }
-
     .dyn-list { display: flex; flex-direction: column; gap: 6px; }
     .dyn-item { display: flex; gap: 8px; align-items: center; }
     .dyn-item input { flex: 1; }
-    .btn-remove-item {
-      background: none; border: none;
-      font-size: 1.2rem; cursor: pointer;
-      color: #bbb; padding: 4px 6px;
-      min-width: 36px; min-height: 36px;
-      display: flex; align-items: center; justify-content: center;
-    }
+    .btn-remove-item { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #bbb; padding: 4px 6px; min-width: 36px; min-height: 36px; display: flex; align-items: center; justify-content: center; }
     .btn-remove-item:hover { color: var(--danger); }
-    .btn-add-item {
-      align-self: flex-start;
-      padding: 8px 14px;
-      border: 1.5px dashed var(--border);
-      border-radius: 10px;
-      background: none;
-      font-size: 0.85rem;
-      color: var(--text-sub);
-      cursor: pointer;
-      margin-top: 4px;
-      min-height: 38px;
-    }
+    .btn-add-item { align-self: flex-start; padding: 8px 14px; border: 1.5px dashed var(--border); border-radius: 10px; background: none; font-size: 0.85rem; color: var(--text-sub); cursor: pointer; margin-top: 4px; min-height: 38px; }
     .btn-add-item:active { background: var(--accent-light); }
-
     .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px; }
-    .btn-cancel {
-      padding: 12px 20px;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      background: none;
-      font-size: 0.95rem;
-      cursor: pointer;
-      color: var(--text-sub);
-      min-height: 44px;
-    }
-    .btn-save {
-      padding: 12px 24px;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      cursor: pointer;
-      min-height: 44px;
-      flex: 1;
-    }
+    .btn-cancel { padding: 12px 20px; border: 1.5px solid var(--border); border-radius: 10px; background: none; font-size: 0.95rem; cursor: pointer; color: var(--text-sub); min-height: 44px; }
+    .btn-save { padding: 12px 24px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 700; cursor: pointer; min-height: 44px; flex: 1; }
     .btn-save:active { background: var(--accent-dark); }
-
-    /* ===== DETAIL ===== */
     .detail-emoji { font-size: 2.5rem; margin-bottom: 6px; }
     .detail-header { margin-bottom: 16px; }
     .detail-header h2 { font-size: 1.3rem; color: var(--text); margin-bottom: 8px; }
     .detail-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
     .detail-section { margin-bottom: 16px; }
-    .detail-section h3 {
-      font-size: 0.88rem; font-weight: 700;
-      color: var(--accent-dark);
-      border-bottom: 2px solid var(--accent-light);
-      padding-bottom: 4px; margin-bottom: 10px;
-    }
+    .detail-section h3 { font-size: 0.88rem; font-weight: 700; color: var(--accent-dark); border-bottom: 2px solid var(--accent-light); padding-bottom: 4px; margin-bottom: 10px; }
     .ingredient-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
-    .ingredient-list li {
-      background: var(--surface2);
-      border-radius: 8px;
-      padding: 8px 12px;
-      font-size: 0.92rem;
-    }
+    .ingredient-list li { background: var(--surface2); border-radius: 8px; padding: 8px 12px; font-size: 0.92rem; }
     .step-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
     .step-list li { display: flex; gap: 12px; font-size: 0.92rem; line-height: 1.7; }
-    .step-num {
-      flex-shrink: 0; width: 26px; height: 26px;
-      background: var(--accent); color: #fff;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.75rem; font-weight: 700; margin-top: 1px;
-    }
-    .notes-box {
-      background: var(--surface2);
-      border-left: 3px solid var(--accent);
-      padding: 10px 14px;
-      border-radius: 0 8px 8px 0;
-      font-size: 0.88rem;
-      white-space: pre-wrap;
-      line-height: 1.7;
-    }
+    .step-num { flex-shrink: 0; width: 26px; height: 26px; background: var(--accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; margin-top: 1px; }
+    .notes-box { background: var(--surface2); border-left: 3px solid var(--accent); padding: 10px 14px; border-radius: 0 8px 8px 0; font-size: 0.88rem; white-space: pre-wrap; line-height: 1.7; }
     .detail-actions { display: flex; gap: 10px; margin-top: 8px; }
-    .btn-edit {
-      flex: 1; padding: 12px;
-      background: var(--surface2);
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      color: var(--text);
-      min-height: 44px;
-    }
-    .btn-delete {
-      flex: 1; padding: 12px;
-      background: none;
-      border: 1.5px solid #e0a0a0;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      color: var(--danger);
-      min_height: 44px;
-    }
+    .btn-edit { flex: 1; padding: 12px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 10px; font-size: 0.9rem; cursor: pointer; color: var(--text); min-height: 44px; }
+    .btn-delete { flex: 1; padding: 12px; background: none; border: 1.5px solid #e0a0a0; border-radius: 10px; font-size: 0.9rem; cursor: pointer; color: var(--danger); min-height: 44px; }
     .btn-delete:active { background: #fde8e8; }
-
-    /* ===== CONFIRM ===== */
     .confirm-modal { text-align: center; }
     .confirm-modal p { margin: 10px 0 18px; color: var(--text-sub); line-height: 1.7; }
     .confirm-actions { display: flex; gap: 10px; }
-    .btn-confirm-del {
-      flex: 1; padding: 12px;
-      background: var(--danger); color: #fff;
-      border: none; border-radius: 10px;
-      font-size: 0.9rem; cursor: pointer;
-      min-height: 44px;
-    }
-    .btn-cancel-confirm {
-      flex: 1; padding: 12px;
-      background: var(--surface2);
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      font-size: 0.9rem; cursor: pointer;
-      color: var(--text-sub);
-      min-height: 44px;
-    }
-
-    /* ===== DESKTOP overrides ===== */
+    .btn-confirm-del { flex: 1; padding: 12px; background: var(--danger); color: #fff; border: none; border-radius: 10px; font-size: 0.9rem; cursor: pointer; min-height: 44px; }
+    .btn-cancel-confirm { flex: 1; padding: 12px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 10px; font-size: 0.9rem; cursor: pointer; color: var(--text-sub); min-height: 44px; }
     @media (min-width: 640px) {
       .btn-add-desktop { display: inline-flex; align-items: center; }
       .backdrop { justify-content: center; align-items: center; padding: 24px 12px; overflow-y: auto; }
-      .modal {
-        max-width: 600px; max-height: none;
-        border-radius: 18px;
-        margin: auto;
-        animation: fadeIn 0.2s ease;
-        padding: 28px;
-      }
+      .modal { max-width: 600px; max-height: none; border-radius: 18px; margin: auto; animation: fadeIn 0.2s ease; padding: 28px; }
       @keyframes fadeIn { from { opacity:0; transform: scale(0.97); } to { opacity:1; transform: none; } }
       .modal-handle { display: none; }
       .confirm-modal { max-width: 360px; }
@@ -449,9 +115,7 @@
       .card-title { font-size: 0.9rem; }
       .form-row { flex-direction: column; gap: 0; }
     }
-    @media (max-width: 360px) {
-      .grid { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 360px) { .grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -461,8 +125,6 @@
     <h1>🍳 マイレシピ帳</h1>
     <div class="subtitle">作れる料理をまとめよう</div>
   </div>
-  <div class="header-spacer"></div>
-  
 </header>
 
 <div class="container">
@@ -472,7 +134,7 @@
       <input type="search" id="searchInput" placeholder="レシピ名・材料・タグで検索…" oninput="renderCards()" autocomplete="off" />
     </div>
     <select class="filter-select" id="categoryFilter" onchange="renderCards()">
-      <option value="">すぽて</option>
+      <option value="">すべて</option>
     </select>
     <button class="btn-add-desktop" onclick="openAddModal()">＋ レシピを追加</button>
   </div>
@@ -480,10 +142,8 @@
   <div class="grid" id="grid"></div>
 </div>
 
-<!-- FAB -->
 <button class="btn-add-fab" onclick="openAddModal()" aria-label="レシピを追加">＋</button>
 
-<!-- ADD/EDIT MODAL -->
 <div class="backdrop" id="formBackdrop">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -547,12 +207,10 @@
   </div>
 </div>
 
-<!-- DETAIL MODAL -->
 <div class="backdrop" id="detailBackdrop">
   <div class="modal" id="detailContent" style="max-width:640px"></div>
 </div>
 
-<!-- CONFIRM DELETE -->
 <div class="backdrop" id="confirmBackdrop">
   <div class="modal confirm-modal" style="max-width:360px">
     <div class="modal-handle"></div>
@@ -565,13 +223,9 @@
   </div>
 </div>
 
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-
 <script>
-// ==================== FIREBASE CONFIG ====================
 const firebaseConfig = {
   apiKey: "AIzaSyCfEsOZ2-ColJUNfsfS2zrPR0ElmmWrcGw",
   authDomain: "recipe-book-f3f54.firebaseapp.com",
@@ -582,73 +236,19 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-const auth = firebase.auth();
 const recipesCol = db.collection('recipes');
 
-// ==================== DATA ====================
-let recipes = [];
-let editingId = null;
-let deletingId = null;
-let initDone = false;
-let currentUser = null;
+let recipes = [], editingId = null, deletingId = null, initDone = false;
 
 function getBuiltinRecipes() {
   return [
-    {
-      id: 'builtin_kanimid',
-      name: 'かにかまときゅうりの中華サラダ',
-      emoji: '🥗', category: 'サラダ',
-      time: '10分', servings: '2人分',
-      tags: ['簡単', '中華', 'やみつき'],
-      ingredients: [
-        'かにかま 80g', 'きゅうり 1本', 'コーン缶 50g（水気を切る）',
-        'ごま油 大さじ１', '酢 大さじ１', 'しょうゆ 小さじ１',
-        '砂糖 小さじ½', '白いりごま 小さじ１', '塩 少々（もみ用）'
-      ],
-      steps: [
-        'きゅうりを細切りにして塩少々でもみ、5分おいたら水気をしっかり絞る',
-        'かにかまを食べやすい大きさにほぐす',
-        'ごま油・酢・しょうゆ・砂糖をよく混ぜ合わせてドレッシングを作る',
-        'かにかま・きゅうり・コーンをボウルに入れ、ドレッシングで和える',
-        '器に盛り、白いりごまを散らして完成'
-      ],
-      notes: '冷蔵庫で３０分ほど冷やすと味がなじんでさらに美味しくなります。きゅうりの水気はしっかり絞るのがシャキシャキ食感のコツです！',
-      createdAt: 1746979200000
-    },
-    {
-      id: 'builtin_nikujaga',
-      name: '肉じゃが', emoji: '🍲', category: '和食',
-      time: '40分', servings: '4人分',
-      tags: ['定番', '作り置き', '野菜'],
-      ingredients: ['じゃがいも 3個', '牛薄切り肉 150g', '玉ねぎ 1個', '人参 1本', '醤油 大さじ3', 'みりん 大さじ3', '砂糖 大さじ2'],
-      steps: ['野菜を食べやすい大きさに切る', '鍋に油を熱し、肉と野菜を炒める', '水を加えて煮立てたらアクを取る', '調味料を加えて落し蓋をして20分煮る'],
-      notes: '冷めるときに味が染みこむので、一度冷ますとより美味しい。',
-      createdAt: 1746892800000
-    },
-    {
-      id: 'builtin_arrabiata',
-      name: 'パスタ・アラビアータ', emoji: '🍝', category: '洋食',
-      time: '20分', servings: '2人分',
-      tags: ['簡単', 'スピード'],
-      ingredients: ['パスタ 200g', 'トマト缶 1缶', 'にんにく 2片', '唐辛子 1本', 'オリーブオイル 大さじ2', '塩・胡椒 適量'],
-      steps: ['にんにくと唐辛子を油で炒める', 'トマト缶を加えて10分煮詰める', 'パスタを茹でてソースと絡める'],
-      notes: 'ゆで汁をソースに加えると乳化しやすい。',
-      createdAt: 1746806400000
-    },
-    {
-      id: 'builtin_banana',
-      name: 'バナナパウンドケーキ', emoji: '🍌', category: 'おやつ・スイーツ',
-      time: '60分', servings: '8切れ',
-      tags: ['お菓子', '焼き菓子'],
-      ingredients: ['完熟バナナ 2本', '薄力粉 150g', '砂糖 80g', '卵 2個', 'バター 80g', 'ベーキングパウダー 小さじ１'],
-      steps: ['バターと砂糖をよく混ぜる', '卵を１個ずつ加えて混ぜる', 'つぶしたバナナを加える', '粉類を振るいながら折り込む', '170℃で４０分焼く'],
-      notes: '完全に冷めてから切ると綺麗に切れる。',
-      createdAt: 1746720000000
-    }
+    { id:'builtin_kanimid', name:'かにかまときゅうりの中華サラダ', emoji:'🥗', category:'サラダ', time:'10分', servings:'2人分', tags:['簡単','中華','やみつき'], ingredients:['かにかま 80g','きゅうり 1本','コーン缶 50g','ごま油 大さじ１','酢 大さじ１','しょうゆ 小さじ１','砂糖 小さじ½','白いりごま 小さじ１','塩 少々'], steps:['きゅうりを細切りにして塩でもみ水気を絞る','かにかまをほぐす','調味料を混ぜドレッシングを作る','全てを和えごまを散らす'], notes:'冷やすと味がなじみます。', createdAt:1746979200000 },
+    { id:'builtin_nikujaga', name:'肉じゃが', emoji:'🍲', category:'和食', time:'40分', servings:'4人分', tags:['定番','作り置き'], ingredients:['じゃがいも 3個','牛薄切り肉 150g','玉ねぎ 1個','人参 1本','醤油 大さじ3','みりん 大さじ3','砂糖 大さじ2'], steps:['野菜を切る','肉と野菜を炒める','水を加えアクを取る','調味料を加え20分煮る'], notes:'冷めるときに味が染みます。', createdAt:1746892800000 },
+    { id:'builtin_arrabiata', name:'パスタ・アラビアータ', emoji:'🍝', category:'洋食', time:'20分', servings:'2人分', tags:['簡単','スピード'], ingredients:['パスタ 200g','トマト缶 1缶','にんにく 2片','唐辛子 1本','オリーブオイル 大さじ2'], steps:['にんにくと唐辛子を炒める','トマト缶を加え10分煮詰める','パスタを茹でソースと絡める'], notes:'ゆで汁を加えると乳化しやすい。', createdAt:1746806400000 },
+    { id:'builtin_banana', name:'バナナパウンドケーキ', emoji:'🍌', category:'おやつ・スイーツ', time:'60分', servings:'8切れ', tags:['お菓子','焼き菓子'], ingredients:['完熟バナナ 2本','薄力粉 150g','砂糖 80g','卵 2個','バター 80g','ベーキングパウダー 小さじ１'], steps:['バターと砂糖を混ぜる','卵を加える','バナナを加える','粉を折り込む','170℃で40分焼く'], notes:'冷めてから切ると綺麗に切れます。', createdAt:1746720000000 }
   ];
 }
 
-// ==================== FIRESTORE ====================
 function showLoading() {
   document.getElementById('grid').innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><p>レシピを読み込み中…</p></div>';
   document.getElementById('recipeCount').textContent = '';
@@ -660,16 +260,12 @@ function initFirestore() {
     recipes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     if (!initDone) {
       initDone = true;
-      if (recipes.length === 0) {
-        seedBuiltinRecipes();
-        return;
-      }
+      if (recipes.length === 0) { seedBuiltinRecipes(); return; }
     }
     renderCards();
   }, err => {
     console.error('Firestore error:', err);
-    document.getElementById('grid').innerHTML =
-      '<div class="empty-state"><div class="empty-icon">⚠️</div><p>読み込みに失敗しました。<br>インターネット接続を確認してください。</p></div>';
+    document.getElementById('grid').innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>読み込みに失敗しました。<br>インターネット接続を確認してください。</p></div>';
   });
 }
 
@@ -681,7 +277,6 @@ async function seedBuiltinRecipes() {
 
 function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
 
-// ==================== RENDER ====================
 function getFiltered() {
   const q = document.getElementById('searchInput').value.toLowerCase().trim();
   const cat = document.getElementById('categoryFilter').value;
@@ -729,7 +324,6 @@ function renderCards() {
   `).join('');
 }
 
-// ==================== DETAIL ====================
 function openDetail(id) {
   const r = recipes.find(x=>x.id===id);
   if (!r) return;
@@ -744,24 +338,12 @@ function openDetail(id) {
         <span class="card-category">${esc(r.category||'その他')}</span>
         ${r.time?`<span>⏱ ${esc(r.time)}</span>`:''}
         ${r.servings?`<span>👥 ${esc(r.servings)}</span>`:''}
-        ${r.tags?.length?r.tags.map(t=>`<span class="tag">${esj.t)}</span>`).join(''):''}
+        ${r.tags?.length?r.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join(''):''}
       </div>
     </div>
-    ${r.ingredients?.length?`
-    <div class="detail-section">
-      <h3>🛒 材料</h3>
-      <ul class="ingredient-list">${r.ingredients.filter(Boolean).map(i=>`<li>${esc(i)}</li>`).join('')}</ul>
-    </div>`:''}
-    ${r.steps?.length?`
-    <div class="detail-section">
-      <h3>👩‍🍳 作り方</h3>
-      <ol class="step-list">${r.steps.filter(Boolean).map((s,i)=>`<li><span class="step-num">${i+1}</span><span>${esc(s)}</span></li>`).join('')}</ol>
-    </div>`:''}
-    ${r.notes?`
-    <div class="detail-section">
-      <h3>📝 メモ・ポイント</h3>
-      <div class="notes-box">${esc(r.notes)}</div>
-    </div>`:''}
+    ${r.ingredients?.length?`<div class="detail-section"><h3>🛒 材料</h3><ul class="ingredient-list">${r.ingredients.filter(Boolean).map(i=>`<li>${esc(i)}</li>`).join('')}</ul></div>`:''}
+    ${r.steps?.length?`<div class="detail-section"><h3>👩‍🍳 作り方</h3><ol class="step-list">${r.steps.filter(Boolean).map((s,i)=>`<li><span class="step-num">${i+1}</span><span>${esc(s)}</span></li>`).join('')}</ol></div>`:''}
+    ${r.notes?`<div class="detail-section"><h3>📝 メモ・ポイント</h3><div class="notes-box">${esc(r.notes)}</div></div>`:''}
     <div class="detail-actions">
       <button class="btn-edit" onclick="closeDetail();openEditModal('${r.id}')">✏️ 編集する</button>
       <button class="btn-delete" onclick="closeDetail();askDelete('${r.id}')">🗑️ 削除する</button>
@@ -771,7 +353,6 @@ function openDetail(id) {
 }
 function closeDetail() { document.getElementById('detailBackdrop').classList.remove('open'); }
 
-// ==================== FORM ====================
 function openAddModal() {
   editingId = null;
   document.getElementById('formTitle').textContent = '新しいレシピを追加';
@@ -820,7 +401,7 @@ function addStep(val='') {
   const n = list.children.length+1;
   const div = document.createElement('div');
   div.className='dyn-item';
-  div.innerHTML<`<span style="flex-shrink:0;color:var(--accent-dark);font-size:0.8rem;font-weight:700;width:18px;text-align:center">${n}</span><input type="text" placeholder="手順 ${n}" value="${esc(val)}" /><button class="btn-remove-item" onclick="removeStep(this)">✕</button>`;
+  div.innerHTML=`<span style="flex-shrink:0;color:var(--accent-dark);font-size:0.8rem;font-weight:700;width:18px;text-align:center">${n}</span><input type="text" placeholder="手順 ${n}" value="${esc(val)}" /><button class="btn-remove-item" onclick="removeStep(this)">✕</button>`;
   list.appendChild(div);
 }
 
@@ -840,8 +421,7 @@ async function saveRecipe() {
   const tags = document.getElementById('fTags').value.split(',').map(t=>t.trim()).filter(Boolean);
   const existing = editingId ? recipes.find(r=>r.id===editingId) : null;
   const recipeData = {
-    id: editingId || genId(),
-    name,
+    id: editingId || genId(), name,
     emoji: document.getElementById('fEmoji').value.trim() || '🍽️',
     category: document.getElementById('fCategory').value,
     time: document.getElementById('fTime').value.trim(),
@@ -863,7 +443,6 @@ async function saveRecipe() {
 }
 function closeFormModal() { document.getElementById('formBackdrop').classList.remove('open'); }
 
-// ==================== DELETE ====================
 function askDelete(id) {
   deletingId = id;
   const r = recipes.find(x=>x.id===id);
@@ -884,10 +463,10 @@ async function confirmDelete() {
   }
 }
 
-// ==================== UTILS ====================
 function esc(str) {
   return String(str??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
 ['formBackdrop','detailBackdrop','confirmBackdrop'].forEach(id=>{
   document.getElementById(id).addEventListener('click', function(e){
     if (e.target===this) {
@@ -898,7 +477,6 @@ function esc(str) {
   });
 });
 
-// ==================== INIT ====================
 initFirestore();
 </script>
 </body>
