@@ -898,24 +898,6 @@ function esc(str) {
   });
 });
 
-// ==================== AUTH ====================
-
-function applyAuthUI(user) {
-  const loggedIn = !!user;
-
-  const addDesktop = document.querySelector('.btn-add-desktop');
-  const addFab = document.querySelector('.btn-add-fab');
-  if (addDesktop) addDesktop.style.display = loggedIn ? '' : 'none';
-  if (addFab) addFab.style.display = loggedIn ? '' : 'none';
-
-  renderCards();
-}
-
-auth.onAuthStateChanged(user => {
-  currentUser = user;
-  applyAuthUI(user);
-});
-
 // ==================== INIT ====================
 initFirestore();
 </script>
