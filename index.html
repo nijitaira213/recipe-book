@@ -449,7 +449,7 @@ function askDelete(id) {
   document.getElementById('confirmName').textContent = r?.name||'';
   document.getElementById('confirmBackdrop').classList.add('open');
 }
-function closeConfirm() { document.getElementById('confirmBackdrop').classList.remove('open'); deletingId=null; }
+function closeConfirm() { document.getElementById('confirmBackdrop').classList.remove('open'); deletingId=null; const btn=document.querySelector('.btn-confirm-del'); if(btn){btn.disabled=false;btn.textContent='削除する';} }
 async function confirmDelete() {
   if (!deletingId) return;
   const btn = document.querySelector('.btn-confirm-del');
