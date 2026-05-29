@@ -26,7 +26,7 @@
 const { Engine, Bodies, Body, World, Events } = Matter;
 
 // ---- 定数 ----
-const LW = 400, LH = 700;  // 論理サイズ
+const LW = 400, LH = 850;  // 論理サイズ
 const BL = 35, BR = 365;   // ボックス左右
 const BT = 115, BB = 655;  // ボックス上下
 const DY = 68;              // ドロップ位置Y
@@ -265,6 +265,9 @@ function draw() {
   }
   ctx.restore();
 
+  // フルーツ早見表
+  drawGuide();
+
   // ゲームオーバー
   if (gameOver) {
     ctx.fillStyle = 'rgba(0,0,0,0.58)';
@@ -322,6 +325,67 @@ canvas.addEventListener('touchend', e => {
   }
   drop();
 }, { passive: false });
+
+// ---- フルーツ早見表 ----
+function drawGuide() {
+  const gy = BB + 16;
+  const gw = BR - BL + WT * 2;
+
+  // 背景
+  ctx.fillStyle = 'rgba(255,255,255,0.72)';
+  rrect(BL - WT, gy, gw, LH - gy - 8, 6);
+  ctx.fill();
+
+  // タイトル
+  ctx.fillStyle = '#777';
+  ctx.font = 'bold 11px -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillText('フルーツ早見表（小さい順 → 合体で大きくなる）', LW / 2, gy + 7);
+
+  const rows = [FRUITS.slice(0, 6), FRUITS.slice(6)];
+  const rowH = 68;
+
+  rows.forEach((row, ri) => {
+    const y0 = gy + 26 + ri * rowH;
+    const itemW = (BR - BL) / row.length;
+
+    row.forEach((f, i) => {
+      const x = BL + itemW * i + itemW / 2;
+
+      // 絵文字
+      ctx.font = '22px serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(f.e, x, y0 + 16);
+
+      // スコア
+      ctx.fillStyle = '#e8739a';
+      ctx.font = 'bold 10px -apple-system, sans-serif';
+      ctx.textBaseline = 'top';
+      ctx.fillText(f.s + 'pt', x, y0 + 30);
+
+      // 矢印（アイテム間）
+      if (i < row.length - 1) {
+        ctx.fillStyle = '#ccc';
+        ctx.font = '10px sans-serif';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('▶', x + itemW / 2, y0 + 16);
+      }
+
+      ctx.fillStyle = '#777';
+    });
+
+    // 行間の↓矢印（右端）
+    if (ri === 0) {
+      ctx.fillStyle = '#ccc';
+      ctx.font = '13px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('↓', BR - 6, y0 + 16 + rowH / 2);
+    }
+  });
+}
 
 // ---- ループ ----
 function loop() {
