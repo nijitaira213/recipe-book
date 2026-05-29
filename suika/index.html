@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🍉 スイカゲーム</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: #1e0a3c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+      touch-action: none;
+      user-select: none;
+    }
+    canvas { display: block; cursor: none; }
+  </style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+const { Engine, Bodies, Body, World, Events } = Matter;
+
+// ---- 定数 ----
+const LW = 400, LH = 700;  // 論理サイズ
+const BL = 35, BR = 365;   // ボックス左右
+const BT = 115, BB = 655;  // ボックス上下
+const DY = 68;              // ドロップ位置Y
+const DANGER_Y = BT + 45;  // ゲームオーバーライン
+const WT = 28;              // 壁の厚さ
+
+const FRUITS = [
+  { e:'🍒', r:18,  s:1  },
+  { e:'🍓', r:25,  s:3  },
+  { e:'🍇', r:33,  s:6  },
+  { e:'🍊', r:41,  s:10 },
+  { e:'🍋', r:49,  s:15 },
+  { e:'🍎', r:57,  s:21 },
+  { e:'🍐', r:65,  s:28 },
+  { e:'🍑', r:74,  s:36 },
+  { e:'🍍', r:83,  s:45 },
+  { e:'🍈', r:93,  s:55 },
+  { e:'🍉', r:106, s:66 },
+];
+
+// ---- キャンバス ----
+const canvas = document.getElementById('c');
+const ctx    = canvas.getContext('2d');
+
+function resize() {
+  const sc = Math.min(window.innerWidth / LW, window.innerHeight / LH);
+  canvas.style.width  = LW * sc + 'px';
+  canvas.style.height = LH * sc + 'px';
+  canvas.width  = LW;
+  canvas.height = LH;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ---- 物理エンジン ----
+const engine = Engine.create({ gravity: { x: 0, y: 1.8 } });
+const world  = engine.world;
+
+const cx = (BL + BR) / 2;
+const cy = (BT + BB) / 2;
+World.add(world, [
+  Bodies.rectangle(cx, BB + WT/2,      BR-BL + WT*2, WT, { isStatic:true }), // 底
+  Bodies.rectangle(BL - WT/2, cy,      WT, BB-BT + WT*2, { isStatic:true }), // 左
+  Bodies.rectangle(BR + WT/2, cy,      WT, BB-BT + WT*2, { isStatic:true }), // 右
+]);
+
+// ---- 状態 ----
+let fruits     = [];
+let mergeQueue = [];
+let cooldown   = new Set();
+let score      = 0;
+let hi         = Number(localStorage.getItem('suika_hi') || 0);
+let gameOver   = false;
+let canDrop    = true;
+let dropX      = LW / 2;
+let curType    = rnd(5);
+let nxtType    = rnd(5);
+let overFrames = 0;
+
+function rnd(n) { return Math.floor(Math.random() * n); }
+
+// ---- フルーツ追加 ----
+function addFruit(x, y, type, vx=0, vy=0) {
+  const f = FRUITS[type];
+  const b = Bodies.circle(x, y, f.r, {
+    restitution: 0.15,
+    friction: 0.6,
+    frictionAir: 0.008,
+    density: 0.003,
+    label: 'fruit',
+  });
+  b.fruitType = type;
+  Body.setVelocity(b, { x: vx, y: vy });
+  World.add(world, b);
+  fruits.push(b);
+  return b;
+}
+
+// ---- ドロップ ----
+function drop() {
+  if (!canDrop || gameOver) return;
+  const f = FRUITS[curType];
+  const x = Math.max(BL+f.r+2, Math.min(BR-f.r-2, dropX));
+  addFruit(x, DY, curType, 0, 3);
+  canDrop = false;
+  setTimeout(() => {
+    curType = nxtType;
+    nxtType = rnd(5);
+    canDrop = true;
+  }, 420);
+}
+
+// ---- 衝突 → マージ ----
+Events.on(engine, 'collisionStart', ev => {
+  if (gameOver) return;
+  for (const { bodyA, bodyB } of ev.pairs) {
+    if (bodyA.label !== 'fruit' || bodyB.label !== 'fruit') continue;
+    if (bodyA.fruitType !== bodyB.fruitType) continue;
+    if (bodyA.fruitType >= FRUITS.length - 1) continue;
+    if (cooldown.has(bodyA.id) || cooldown.has(bodyB.id)) continue;
+    if (bodyA.merged || bodyB.merged) continue;
+    bodyA.merged = true;
+    bodyB.merged = true;
+    mergeQueue.push([bodyA, bodyB]);
+  }
+});
+
+function processMerges() {
+  const batch = mergeQueue.splice(0);
+  for (const [bA, bB] of batch) {
+    if (!world.bodies.includes(bA) || !world.bodies.includes(bB)) continue;
+    const mx   = (bA.position.x + bB.position.x) / 2;
+    const my   = (bA.position.y + bB.position.y) / 2;
+    const type = bA.fruitType + 1;
+    score += FRUITS[type].s;
+    if (score > hi) { hi = score; localStorage.setItem('suika_hi', hi); }
+    World.remove(world, bA);
+    World.remove(world, bB);
+    fruits = fruits.filter(b => b !== bA && b !== bB);
+    const nb = addFruit(mx, my, type, 0, -2);
+    cooldown.add(nb.id);
+    setTimeout(() => cooldown.delete(nb.id), 600);
+  }
+}
+
+// ---- ゲームオーバー判定 ----
+function checkOver() {
+  if (gameOver || !canDrop) return;
+  const over = fruits.some(b => b.position.y - FRUITS[b.fruitType].r < DANGER_Y);
+  overFrames = over ? overFrames + 1 : 0;
+  if (overFrames > 90) gameOver = true;
+}
+
+// ---- リスタート ----
+function restart() {
+  fruits.forEach(b => World.remove(world, b));
+  fruits = []; mergeQueue = []; cooldown.clear();
+  score = 0; gameOver = false; canDrop = true; overFrames = 0;
+  curType = rnd(5); nxtType = rnd(5); dropX = LW / 2;
+}
+
+// ---- 描画ユーティリティ ----
+function rrect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y); ctx.arcTo(x+w, y,   x+w, y+r,   r);
+  ctx.lineTo(x+w, y+h-r); ctx.arcTo(x+w, y+h, x+w-r, y+h, r);
+  ctx.lineTo(x+r, y+h); ctx.arcTo(x,   y+h, x,   y+h-r, r);
+  ctx.lineTo(x, y+r); ctx.arcTo(x,   y,   x+r, y,     r);
+  ctx.closePath();
+}
+
+// ---- メイン描画 ----
+function draw() {
+  // 背景
+  ctx.fillStyle = '#fef9e7';
+  ctx.fillRect(0, 0, LW, LH);
+
+  // スコア
+  ctx.fillStyle = '#333';
+  ctx.font = 'bold 20px -apple-system, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillText('スコア  ' + score, 16, 12);
+  ctx.fillStyle = '#aaa';
+  ctx.font = '13px -apple-system, sans-serif';
+  ctx.fillText('ベスト  ' + hi, 16, 38);
+
+  // NEXTフルーツ
+  ctx.fillStyle = '#888';
+  ctx.font = '11px -apple-system, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText('NEXT', LW-16, 12);
+  const nf = FRUITS[nxtType];
+  ctx.font = `${Math.min(nf.r * 1.4, 38)}px serif`;
+  ctx.textBaseline = 'middle';
+  ctx.fillText(nf.e, LW-30, 52);
+
+  // ボックス背景
+  ctx.fillStyle = 'rgba(255,255,255,0.75)';
+  rrect(BL-WT, BT, (BR-BL)+WT*2, (BB-BT)+WT, 6);
+  ctx.fill();
+
+  // ゲームオーバーライン
+  ctx.strokeStyle = 'rgba(240,80,80,0.4)';
+  ctx.setLineDash([7,5]);
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(BL, DANGER_Y);
+  ctx.lineTo(BR, DANGER_Y);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // ボックス枠
+  ctx.strokeStyle = '#ddd';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(BL, BT); ctx.lineTo(BL, BB);
+  ctx.moveTo(BR, BT); ctx.lineTo(BR, BB);
+  ctx.moveTo(BL, BB); ctx.lineTo(BR, BB);
+  ctx.stroke();
+
+  // 現在のフルーツ＋ガイド
+  if (!gameOver && canDrop) {
+    const cf = FRUITS[curType];
+    const fx = Math.max(BL+cf.r+2, Math.min(BR-cf.r-2, dropX));
+    ctx.strokeStyle = 'rgba(160,160,160,0.35)';
+    ctx.setLineDash([4,5]);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(fx, DY+cf.r);
+    ctx.lineTo(fx, BB);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font = `${cf.r * 1.5}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(cf.e, fx, DY);
+  }
+
+  // フルーツ描画（クリップ）
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(BL, -20, BR-BL, BB+25);
+  ctx.clip();
+  for (const b of fruits) {
+    const f = FRUITS[b.fruitType];
+    ctx.save();
+    ctx.translate(b.position.x, b.position.y);
+    ctx.rotate(b.angle);
+    ctx.font = `${f.r * 1.52}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(f.e, 0, 0);
+    ctx.restore();
+  }
+  ctx.restore();
+
+  // ゲームオーバー
+  if (gameOver) {
+    ctx.fillStyle = 'rgba(0,0,0,0.58)';
+    ctx.fillRect(0, 0, LW, LH);
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 36px -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('ゲームオーバー', LW/2, LH/2 - 50);
+    ctx.font = '24px -apple-system, sans-serif';
+    ctx.fillText('スコア：' + score, LW/2, LH/2);
+    ctx.font = '16px -apple-system, sans-serif';
+    ctx.fillStyle = '#ffdd88';
+    ctx.fillText('ベスト：' + hi, LW/2, LH/2 + 34);
+    // ボタン
+    ctx.fillStyle = '#ff7043';
+    rrect(LW/2-95, LH/2+65, 190, 52, 14);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 20px -apple-system, sans-serif';
+    ctx.fillText('もう一度あそぶ🍉', LW/2, LH/2 + 91);
+  }
+}
+
+// ---- 入力 ----
+function toLogicalX(clientX) {
+  const r = canvas.getBoundingClientRect();
+  return (clientX - r.left) * (LW / r.width);
+}
+function toLogicalY(clientY) {
+  const r = canvas.getBoundingClientRect();
+  return (clientY - r.top) * (LH / r.height);
+}
+
+canvas.addEventListener('mousemove', e => { dropX = toLogicalX(e.clientX); });
+canvas.addEventListener('click',     e => {
+  if (gameOver) {
+    const lx = toLogicalX(e.clientX), ly = toLogicalY(e.clientY);
+    if (Math.abs(lx - LW/2) < 95 && Math.abs(ly - (LH/2+91)) < 30) restart();
+    return;
+  }
+  drop();
+});
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  dropX = toLogicalX(e.touches[0].clientX);
+}, { passive: false });
+canvas.addEventListener('touchend', e => {
+  e.preventDefault();
+  if (gameOver) {
+    const lx = toLogicalX(e.changedTouches[0].clientX);
+    const ly = toLogicalY(e.changedTouches[0].clientY);
+    if (Math.abs(lx - LW/2) < 95 && Math.abs(ly - (LH/2+91)) < 30) restart();
+    return;
+  }
+  drop();
+}, { passive: false });
+
+// ---- ループ ----
+function loop() {
+  processMerges();
+  Engine.update(engine, 1000/60);
+  checkOver();
+  draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
