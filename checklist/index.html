@@ -864,9 +864,8 @@ function dateForBulkIncome(year, month, source) {
 }
 
 function parseBulkIncome(text) {
-  const yearMatch = text.match(/(20\d{2})/);
-  if (!yearMatch) return { year: '', entries: [] };
-  const year = yearMatch[1];
+  const yearMatch = text.match(/(?:^|\D)(20\d{2})\s*(?:年|の\s*(?:所得|収入))/m);
+  const year = yearMatch ? yearMatch[1] : String(new Date().getFullYear());
   const entries = [];
   let source = '';
   let importSource = '';
