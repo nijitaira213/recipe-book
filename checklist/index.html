@@ -291,6 +291,18 @@
       color: var(--text);
       background: #fff;
     }
+    .field input[type="date"], .month-picker input[type="month"] {
+      width: 100%;
+      max-width: 100%;
+      height: 48px;
+      padding: 0;
+      text-align: center;
+    }
+    .field input[type="date"]::-webkit-date-and-time-value,
+    .month-picker input[type="month"]::-webkit-date-and-time-value {
+      margin: 0;
+      text-align: center;
+    }
     .field textarea { min-height: 190px; resize: vertical; line-height: 1.55; }
     .field input:focus, .field select:focus, .field textarea:focus { outline: 2px solid var(--accent-light); border-color: var(--accent); }
     .btn-primary, .btn-secondary, .btn-danger {
