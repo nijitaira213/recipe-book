@@ -369,6 +369,11 @@
       収入と働いた時間を記録すると、今月と今年の合計が自動でまとまります。
     </div>
 
+    <div class="notice" id="incomeEmptyNotice" hidden>
+      <strong>収入は、まだこの端末に登録されていません。</strong><br />
+      下の「2026年の収入メモを登録する」に、先ほどのメモを貼り付けて登録してください。
+    </div>
+
     <div class="month-picker">
       <button class="icon-btn" id="prevMonth" type="button" aria-label="前の月">‹</button>
       <input id="selectedMonth" type="month" aria-label="表示する月" />
@@ -380,6 +385,8 @@
         <div class="summary-label">選んだ月の全収入</div>
         <div class="summary-value" id="monthlyIncome">0円</div>
         <div class="summary-note" id="incomeCount">目安に含む 0円・不用品販売 0円</div>
+        <div class="mini-bar"><div class="mini-fill" id="monthlyIncomeBar"></div></div>
+        <div class="summary-note" id="monthlyIncomeRemaining">月の目安まであと108,300円</div>
       </article>
       <article class="summary-card hours">
         <div class="summary-label">選んだ月の勤務時間</div>
@@ -399,6 +406,19 @@
         <div class="summary-note" id="yearlyIncomeBreakdown">不用品販売 0円・すべて合計 0円</div>
       </article>
     </div>
+
+    <details class="settings-card" id="bulkIncomePanel">
+      <summary>📝 2026年の収入メモを登録する</summary>
+      <div class="settings-body">
+        <p class="privacy-note">ページを更新しただけでは金額は入りません。先ほどの月別メモをここに貼り付けて、下のボタンを押すと、この端末に登録されます。「※非課税」と書かれた不用品販売は、自動で130万円の目安から外します。</p>
+        <div class="field">
+          <label for="bulkIncomeText">収入メモを貼り付け</label>
+          <textarea id="bulkIncomeText" placeholder="2026の所得&#10;&#10;TOKIUM&#10;2月 10000円&#10;3月 20000円&#10;&#10;メルカリ（不用品）※非課税&#10;1月 3000円"></textarea>
+        </div>
+        <button class="btn-primary" id="bulkImportBtn" type="button">内容を確認してまとめて追加</button>
+        <p class="import-result" id="bulkImportResult" hidden></p>
+      </div>
+    </details>
 
     <section class="entry-card">
       <h2>💴 収入を記録 <span>入金があったとき</span></h2>
@@ -467,22 +487,13 @@
     </section>
 
     <details class="settings-card">
-      <summary>📝 メモから収入をまとめて追加</summary>
-      <div class="settings-body">
-        <p class="privacy-note">これまでの月別メモをそのまま貼り付けられます。「※非課税」と書かれた不用品販売は、自動で130万円の目安から外します。</p>
-        <div class="field">
-          <label for="bulkIncomeText">収入メモを貼り付け</label>
-          <textarea id="bulkIncomeText" placeholder="2026の所得&#10;&#10;TOKIUM&#10;2月 10000円&#10;3月 20000円&#10;&#10;メルカリ（不用品）※非課税&#10;1月 3000円"></textarea>
-        </div>
-        <button class="btn-primary" id="bulkImportBtn" type="button">内容を確認してまとめて追加</button>
-        <p class="import-result" id="bulkImportResult" hidden></p>
-      </div>
-    </details>
-
-    <details class="settings-card">
       <summary>⚙️ 目安・バックアップ</summary>
       <div class="settings-body">
         <form class="form-grid" id="settingsForm">
+          <div class="field full">
+            <label for="monthlyIncomeGoal">毎月の収入目安（円）</label>
+            <input id="monthlyIncomeGoal" type="number" min="1" step="100" inputmode="numeric" required />
+          </div>
           <div class="field full">
             <label for="annualGoal">年間収入の目安（円）</label>
             <input id="annualGoal" type="number" min="1" step="10000" inputmode="numeric" required />
@@ -532,7 +543,7 @@ const MONTH_KEY = 'hoikuen_tracker_month';
 const DEFAULT_TRACKER = {
   income: [],
   hours: [],
-  settings: { annualGoal: 1300000, monthlyHoursGoal: 64 },
+  settings: { annualGoal: 1300000, monthlyIncomeGoal: 108300, monthlyHoursGoal: 64 },
 };
 
 function safeRead(key, fallback) {
@@ -560,6 +571,7 @@ function cleanTracker(value) {
     hours: Array.isArray(source.hours) ? source.hours : [],
     settings: {
       annualGoal: Number(settings.annualGoal) > 0 ? Number(settings.annualGoal) : DEFAULT_TRACKER.settings.annualGoal,
+      monthlyIncomeGoal: Number(settings.monthlyIncomeGoal) > 0 ? Number(settings.monthlyIncomeGoal) : DEFAULT_TRACKER.settings.monthlyIncomeGoal,
       monthlyHoursGoal: Number(settings.monthlyHoursGoal) > 0 ? Number(settings.monthlyHoursGoal) : DEFAULT_TRACKER.settings.monthlyHoursGoal,
     },
   };
@@ -705,10 +717,15 @@ function renderTracker() {
   const yearlyIncome = yearlyIncomeEntries.filter(countsTowardGoal).reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
   const yearlyExcludedIncome = yearlyAllIncome - yearlyIncome;
   const hoursGoal = tracker.settings.monthlyHoursGoal;
+  const monthlyIncomeGoal = tracker.settings.monthlyIncomeGoal;
   const incomeGoal = tracker.settings.annualGoal;
 
   document.getElementById('monthlyIncome').textContent = formatYen(monthlyIncome);
   document.getElementById('incomeCount').textContent = `目安に含む ${formatYen(monthlyCountedIncome)}・不用品販売 ${formatYen(monthlyExcludedIncome)}`;
+  document.getElementById('monthlyIncomeBar').style.width = `${Math.min(100, (monthlyCountedIncome / monthlyIncomeGoal) * 100)}%`;
+  document.getElementById('monthlyIncomeRemaining').textContent = monthlyCountedIncome <= monthlyIncomeGoal
+    ? `月の目安まであと${formatYen(monthlyIncomeGoal - monthlyCountedIncome)}`
+    : `月の目安を${formatYen(monthlyCountedIncome - monthlyIncomeGoal)}超えています`;
   document.getElementById('monthlyHours').textContent = `${formatHours(monthlyHours)} / ${formatHours(hoursGoal)}時間`;
   document.getElementById('hoursBar').style.width = `${Math.min(100, (monthlyHours / hoursGoal) * 100)}%`;
   document.getElementById('hoursRemaining').textContent = monthlyHours >= hoursGoal
@@ -721,8 +738,15 @@ function renderTracker() {
     ? `目安まであと${formatYen(incomeGoal - yearlyIncome)}`
     : `目安を${formatYen(yearlyIncome - incomeGoal)}超えています`;
   document.getElementById('yearlyIncomeBreakdown').textContent = `不用品販売 ${formatYen(yearlyExcludedIncome)}・すべて合計 ${formatYen(yearlyAllIncome)}`;
+  document.getElementById('monthlyIncomeGoal').value = monthlyIncomeGoal;
   document.getElementById('annualGoal').value = incomeGoal;
   document.getElementById('monthlyHoursGoal').value = hoursGoal;
+  document.getElementById('incomeEmptyNotice').hidden = tracker.income.length > 0;
+  const bulkIncomePanel = document.getElementById('bulkIncomePanel');
+  if (!tracker.income.length && !bulkIncomePanel.dataset.emptyNoticeShown) {
+    bulkIncomePanel.open = true;
+    bulkIncomePanel.dataset.emptyNoticeShown = 'true';
+  }
   document.getElementById('incomeDate').value = defaultDateForMonth();
   document.getElementById('hoursDate').value = defaultDateForMonth();
   renderRecords('incomeRecords', monthlyIncomeEntries, 'income');
@@ -798,10 +822,11 @@ function deleteRecord(kind, id) {
 
 function saveSettings(event) {
   event.preventDefault();
+  const monthlyIncomeGoal = Number(document.getElementById('monthlyIncomeGoal').value);
   const annualGoal = Number(document.getElementById('annualGoal').value);
   const monthlyHoursGoal = Number(document.getElementById('monthlyHoursGoal').value);
-  if (!(annualGoal > 0) || !(monthlyHoursGoal > 0)) return;
-  tracker.settings = { annualGoal, monthlyHoursGoal };
+  if (!(monthlyIncomeGoal > 0) || !(annualGoal > 0) || !(monthlyHoursGoal > 0)) return;
+  tracker.settings = { annualGoal, monthlyIncomeGoal, monthlyHoursGoal };
   saveTracker();
   renderTracker();
   alert('目安を保存しました');
