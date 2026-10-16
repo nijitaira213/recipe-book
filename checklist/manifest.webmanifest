@@ -1,0 +1,25 @@
+{
+  "name": "園とおしごと",
+  "short_name": "園とおしごと",
+  "description": "保育園の持ちもの、収入、働いた時間をまとめる手帳",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fff0f5",
+  "theme_color": "#e8739a",
+  "icons": [
+    {
+      "src": "./app-icon-192.png?v=1",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./app-icon-512.png?v=1",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
