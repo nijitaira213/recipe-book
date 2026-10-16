@@ -601,11 +601,51 @@ function cleanTracker(value) {
   };
 }
 
+function repairMisreadBulkIncomeYear(value) {
+  const income = Array.isArray(value.income) ? value.income : [];
+  const unaffectedKeys = new Set(income
+    .filter(entry => !(typeof entry?.importKey === 'string' && /^memo:2040-\d{2}:/.test(entry.importKey)))
+    .map(entry => entry?.importKey)
+    .filter(Boolean));
+  const repairedIncome = [];
+  let repairedCount = 0;
+
+  income.forEach(entry => {
+    const keyMatch = typeof entry?.importKey === 'string'
+      ? entry.importKey.match(/^memo:2040-(\d{2}):(.+)$/)
+      : null;
+    if (!keyMatch || typeof entry.date !== 'string' || !entry.date.startsWith('2040-')) {
+      repairedIncome.push(entry);
+      return;
+    }
+
+    repairedCount += 1;
+    const corrected = {
+      ...entry,
+      date: `2026-${entry.date.slice(5)}`,
+      importKey: `memo:2026-${keyMatch[1]}:${keyMatch[2]}`,
+    };
+    if (!unaffectedKeys.has(corrected.importKey)) {
+      unaffectedKeys.add(corrected.importKey);
+      repairedIncome.push(corrected);
+    }
+  });
+
+  return { repairedIncome, repairedCount };
+}
+
 let checked = safeRead(CHECK_KEY, {});
 let tracker = cleanTracker(safeRead(TRACKER_KEY, DEFAULT_TRACKER));
+const yearRepair = repairMisreadBulkIncomeYear(tracker);
+tracker.income = yearRepair.repairedIncome;
+if (yearRepair.repairedCount) saveTracker();
 let selectedMonth = /^\d{4}-\d{2}$/.test(localStorage.getItem(MONTH_KEY) || '')
   ? localStorage.getItem(MONTH_KEY)
   : localMonth();
+if (yearRepair.repairedCount && selectedMonth.startsWith('2040-')) {
+  selectedMonth = `2026-${selectedMonth.slice(5)}`;
+  localStorage.setItem(MONTH_KEY, selectedMonth);
+}
 
 function saveChecked() {
   localStorage.setItem(CHECK_KEY, JSON.stringify(checked));
@@ -1065,6 +1105,11 @@ document.getElementById('importFile').addEventListener('change', event => {
 
 renderChecklist();
 renderTracker();
+if (yearRepair.repairedCount) {
+  const result = document.getElementById('bulkImportResult');
+  result.textContent = `2040年になっていた収入${yearRepair.repairedCount}件を、2026年へ直しました。`;
+  result.hidden = false;
+}
 </script>
 </body>
 </html>
