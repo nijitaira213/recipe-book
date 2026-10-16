@@ -233,7 +233,7 @@
     }
     .info-card { padding: 14px 15px; font-size: 0.82rem; line-height: 1.55; color: var(--sub); }
     .info-card strong { color: var(--text); }
-    .month-picker { display: grid; grid-template-columns: 44px 1fr 44px; gap: 8px; align-items: center; }
+    .month-picker { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 8px; align-items: center; }
     .month-picker input {
       min-width: 0;
       width: 100%;
@@ -246,6 +246,8 @@
       font-weight: 700;
     }
     .icon-btn {
+      width: 44px;
+      min-width: 0;
       min-height: 44px;
       border: 1px solid var(--border);
       border-radius: 12px;
@@ -254,25 +256,27 @@
       font-size: 1.15rem;
       font-weight: 700;
     }
-    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .summary-card { padding: 14px; }
+    .summary-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+    .summary-card { min-width: 0; padding: 14px; }
     .summary-card.income { border-top: 4px solid var(--accent); }
     .summary-card.hours { border-top: 4px solid #4b9b70; }
     .summary-card.year-card { grid-column: 1 / -1; }
     .summary-label { color: var(--sub); font-size: 0.75rem; line-height: 1.35; }
     .summary-value { font-size: 1.25rem; font-weight: 800; margin-top: 5px; letter-spacing: -0.02em; }
+    .monthly-income-card .summary-value { color: var(--accent-dark); white-space: nowrap; }
     .summary-note { color: var(--sub); font-size: 0.72rem; margin-top: 4px; line-height: 1.4; }
     .mini-bar { height: 7px; border-radius: 99px; background: #eee8ea; overflow: hidden; margin-top: 9px; }
     .mini-fill { height: 100%; border-radius: inherit; width: 0; transition: width 0.3s ease; }
     .income .mini-fill { background: var(--accent); }
     .hours .mini-fill { background: #4b9b70; }
-    .year-top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
-    .remaining { color: var(--accent-dark); font-size: 0.78rem; font-weight: 700; text-align: right; }
+    .year-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; align-items: baseline; }
+    .year-top > * { min-width: 0; }
+    .remaining { color: var(--accent-dark); font-size: 0.78rem; font-weight: 700; text-align: right; overflow-wrap: anywhere; }
     .entry-card { padding: 16px; }
     .entry-card h2 { font-size: 1rem; margin-bottom: 12px; }
     .entry-card h2 span { font-size: 0.76rem; font-weight: 500; color: var(--sub); }
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .field { display: grid; gap: 5px; }
+    .form-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+    .field { min-width: 0; display: grid; gap: 5px; }
     .field.full { grid-column: 1 / -1; }
     .field label { font-size: 0.76rem; font-weight: 700; color: var(--sub); }
     .field input, .field select, .field textarea {
@@ -324,10 +328,12 @@
     .backup-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .privacy-note { color: var(--sub); font-size: 0.75rem; line-height: 1.5; }
     .import-result { color: #357955; font-size: 0.8rem; font-weight: 700; line-height: 1.5; }
-    @media (max-width: 380px) {
-      .summary-grid, .form-grid { grid-template-columns: 1fr; }
+    @media (max-width: 520px) {
+      .summary-grid, .form-grid { grid-template-columns: minmax(0, 1fr); }
       .summary-card.year-card, .field.full, .btn-primary { grid-column: auto; }
-      .summary-value { font-size: 1.12rem; }
+      .summary-value { font-size: 1.2rem; }
+      .monthly-income-card .summary-value { font-size: 1.42rem; }
+      .remaining { text-align: left; }
     }
   </style>
 </head>
@@ -381,10 +387,10 @@
     </div>
 
     <div class="summary-grid">
-      <article class="summary-card income">
-        <div class="summary-label">選んだ月の全収入</div>
-        <div class="summary-value" id="monthlyIncome">0円</div>
-        <div class="summary-note" id="incomeCount">目安に含む 0円・不用品販売 0円</div>
+      <article class="summary-card income monthly-income-card">
+        <div class="summary-label">目安に含む今月の収入</div>
+        <div class="summary-value" id="monthlyIncome">0円 / 108,300円</div>
+        <div class="summary-note" id="incomeCount">不用品販売 0円・すべて合計 0円</div>
         <div class="mini-bar"><div class="mini-fill" id="monthlyIncomeBar"></div></div>
         <div class="summary-note" id="monthlyIncomeRemaining">月の目安まであと108,300円</div>
       </article>
@@ -431,10 +437,9 @@
           <label for="incomeSource">種類</label>
           <select id="incomeSource" required>
             <option value="パート">パート</option>
-            <option value="TOKIUM">TOKIUM</option>
             <option value="メルカリ（せどり）">メルカリ（せどり）</option>
             <option value="メルカリ（不用品）">メルカリ（不用品）</option>
-            <option value="ジモティー">ジモティー</option>
+            <option value="ジモティー（不用品）">ジモティー（不用品）</option>
             <option value="その他">その他</option>
           </select>
         </div>
@@ -563,11 +568,21 @@ function localDate(date = new Date()) {
   return `${localMonth(date)}-${String(date.getDate()).padStart(2, '0')}`;
 }
 
+function normalizeIncomeSource(source) {
+  if (source === 'TOKIUM') return 'パート';
+  if (source === 'ジモティー') return 'ジモティー（不用品）';
+  return source;
+}
+
 function cleanTracker(value) {
   const source = value && typeof value === 'object' ? value : {};
   const settings = source.settings && typeof source.settings === 'object' ? source.settings : {};
   return {
-    income: Array.isArray(source.income) ? source.income : [],
+    income: Array.isArray(source.income)
+      ? source.income.map(entry => entry && typeof entry === 'object'
+        ? { ...entry, source: normalizeIncomeSource(entry.source) }
+        : entry)
+      : [],
     hours: Array.isArray(source.hours) ? source.hours : [],
     settings: {
       annualGoal: Number(settings.annualGoal) > 0 ? Number(settings.annualGoal) : DEFAULT_TRACKER.settings.annualGoal,
@@ -720,8 +735,8 @@ function renderTracker() {
   const monthlyIncomeGoal = tracker.settings.monthlyIncomeGoal;
   const incomeGoal = tracker.settings.annualGoal;
 
-  document.getElementById('monthlyIncome').textContent = formatYen(monthlyIncome);
-  document.getElementById('incomeCount').textContent = `目安に含む ${formatYen(monthlyCountedIncome)}・不用品販売 ${formatYen(monthlyExcludedIncome)}`;
+  document.getElementById('monthlyIncome').textContent = `${formatYen(monthlyCountedIncome)} / ${formatYen(monthlyIncomeGoal)}`;
+  document.getElementById('incomeCount').textContent = `不用品販売 ${formatYen(monthlyExcludedIncome)}・すべて合計 ${formatYen(monthlyIncome)}`;
   document.getElementById('monthlyIncomeBar').style.width = `${Math.min(100, (monthlyCountedIncome / monthlyIncomeGoal) * 100)}%`;
   document.getElementById('monthlyIncomeRemaining').textContent = monthlyCountedIncome <= monthlyIncomeGoal
     ? `月の目安まであと${formatYen(monthlyIncomeGoal - monthlyCountedIncome)}`
@@ -834,7 +849,7 @@ function saveSettings(event) {
 
 function dateForBulkIncome(year, month, source) {
   let day = 1;
-  if (source === 'TOKIUM') day = 25;
+  if (source === 'パート') day = 25;
   if (source === 'メルカリ（せどり）') day = new Date(Number(year), month, 0).getDate();
   return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
@@ -845,6 +860,7 @@ function parseBulkIncome(text) {
   const year = yearMatch[1];
   const entries = [];
   let source = '';
+  let importSource = '';
   let included = true;
 
   text.split(/\r?\n/).forEach(rawLine => {
@@ -852,22 +868,26 @@ function parseBulkIncome(text) {
     if (!line) return;
 
     if (/^TOKIUM/i.test(line)) {
-      source = 'TOKIUM';
+      source = 'パート';
+      importSource = 'TOKIUM';
       included = true;
       return;
     }
     if (/メルカリ.*不用品/.test(line)) {
       source = 'メルカリ（不用品）';
+      importSource = source;
       included = false;
       return;
     }
     if (/メルカリ.*せどり/.test(line)) {
       source = 'メルカリ（せどり）';
+      importSource = source;
       included = true;
       return;
     }
     if (/ジモティー/.test(line)) {
-      source = 'ジモティー';
+      source = 'ジモティー（不用品）';
+      importSource = 'ジモティー';
       included = false;
       return;
     }
@@ -878,7 +898,7 @@ function parseBulkIncome(text) {
     const amount = Number(match[2].replaceAll(',', ''));
     if (month < 1 || month > 12 || !Number.isFinite(amount)) return;
     const monthText = String(month).padStart(2, '0');
-    const defaultMemo = source === 'TOKIUM'
+    const defaultMemo = source === 'パート'
       ? '25日振込'
       : (source === 'メルカリ（せどり）' ? '月の粗利' : '月合計');
     entries.push({
@@ -887,7 +907,7 @@ function parseBulkIncome(text) {
       amount,
       memo: match[3] ? match[3].trim() : defaultMemo,
       countsTowardGoal: included,
-      importKey: `memo:${year}-${monthText}:${source}`,
+      importKey: `memo:${year}-${monthText}:${importSource || source}`,
     });
   });
 
@@ -974,7 +994,7 @@ document.getElementById('selectedMonth').addEventListener('change', event => {
   renderTracker();
 });
 document.getElementById('incomeSource').addEventListener('change', event => {
-  const recordOnly = ['メルカリ（不用品）', 'ジモティー'].includes(event.target.value);
+  const recordOnly = ['メルカリ（不用品）', 'ジモティー（不用品）'].includes(event.target.value);
   document.getElementById('incomeGoalType').value = recordOnly ? 'excluded' : 'counted';
 });
 document.getElementById('incomeForm').addEventListener('submit', addIncome);
