@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="保育園の持ちもの" />
-  <title>🎒 保育園の持ちもの</title>
+  <meta name="apple-mobile-web-app-title" content="保育園サポート" />
+  <meta name="theme-color" content="#e8739a" />
+  <title>🌷 保育園サポート</title>
   <style>
     :root {
       --bg: #fff0f5;
@@ -189,109 +190,642 @@
     }
     .btn-reset:active { background: var(--accent-dark); transform: scale(0.97); }
     .btn-reset:disabled { background: #ccc; }
+
+    /* 画面切り替え */
+    [hidden] { display: none !important; }
+    button, input, select { font: inherit; }
+    body.tracker-mode { padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
+    .mode-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 10px 14px;
+    }
+    .mode-btn {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      color: var(--sub);
+      padding: 10px 6px;
+      font-weight: 700;
+    }
+    .mode-btn.active {
+      color: var(--accent-dark);
+      background: var(--accent-light);
+      border-color: var(--accent);
+    }
+
+    /* 収入・勤務時間 */
+    .tracker {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 14px 30px;
+      display: grid;
+      gap: 12px;
+    }
+    .info-card, .summary-card, .entry-card, .settings-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 4px 18px rgba(160, 70, 105, 0.09);
+    }
+    .info-card { padding: 14px 15px; font-size: 0.82rem; line-height: 1.55; color: var(--sub); }
+    .info-card strong { color: var(--text); }
+    .month-picker { display: grid; grid-template-columns: 44px 1fr 44px; gap: 8px; align-items: center; }
+    .month-picker input {
+      min-width: 0;
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 11px 8px;
+      color: var(--text);
+      text-align: center;
+      font-weight: 700;
+    }
+    .icon-btn {
+      min-height: 44px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      color: var(--accent-dark);
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .summary-card { padding: 14px; }
+    .summary-card.income { border-top: 4px solid var(--accent); }
+    .summary-card.hours { border-top: 4px solid #4b9b70; }
+    .summary-card.year-card { grid-column: 1 / -1; }
+    .summary-label { color: var(--sub); font-size: 0.75rem; line-height: 1.35; }
+    .summary-value { font-size: 1.25rem; font-weight: 800; margin-top: 5px; letter-spacing: -0.02em; }
+    .summary-note { color: var(--sub); font-size: 0.72rem; margin-top: 4px; line-height: 1.4; }
+    .mini-bar { height: 7px; border-radius: 99px; background: #eee8ea; overflow: hidden; margin-top: 9px; }
+    .mini-fill { height: 100%; border-radius: inherit; width: 0; transition: width 0.3s ease; }
+    .income .mini-fill { background: var(--accent); }
+    .hours .mini-fill { background: #4b9b70; }
+    .year-top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+    .remaining { color: var(--accent-dark); font-size: 0.78rem; font-weight: 700; text-align: right; }
+    .entry-card { padding: 16px; }
+    .entry-card h2 { font-size: 1rem; margin-bottom: 12px; }
+    .entry-card h2 span { font-size: 0.76rem; font-weight: 500; color: var(--sub); }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .field { display: grid; gap: 5px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { font-size: 0.76rem; font-weight: 700; color: var(--sub); }
+    .field input, .field select {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid #dcc8cf;
+      border-radius: 10px;
+      padding: 11px;
+      color: var(--text);
+      background: #fff;
+    }
+    .field input:focus, .field select:focus { outline: 2px solid var(--accent-light); border-color: var(--accent); }
+    .btn-primary, .btn-secondary, .btn-danger {
+      border-radius: 12px;
+      font-weight: 700;
+      border: none;
+    }
+    .btn-primary { grid-column: 1 / -1; width: 100%; padding: 14px; background: var(--accent); color: #fff; }
+    .btn-secondary { padding: 11px 8px; background: var(--accent-light); color: var(--accent-dark); border: 1px solid var(--border); }
+    .btn-danger { padding: 7px 10px; background: #fff0f0; color: #b44b4b; font-size: 0.78rem; }
+    .records { list-style: none; margin-top: 14px; display: grid; gap: 8px; }
+    .record {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      background: #fff9fb;
+      border: 1px solid #f2dce5;
+      border-radius: 11px;
+      padding: 10px 11px;
+    }
+    .record-main { min-width: 0; }
+    .record-title { font-size: 0.88rem; font-weight: 700; }
+    .record-meta { color: var(--sub); font-size: 0.73rem; margin-top: 3px; overflow-wrap: anywhere; }
+    .record-value { font-weight: 800; color: var(--accent-dark); white-space: nowrap; }
+    .hours-card .record-value { color: #4b9b70; }
+    .empty { color: var(--sub); text-align: center; font-size: 0.82rem; padding: 12px 4px 2px; }
+    details.settings-card { overflow: hidden; }
+    details.settings-card summary { list-style: none; cursor: pointer; padding: 15px 16px; font-weight: 700; }
+    details.settings-card summary::-webkit-details-marker { display: none; }
+    details.settings-card summary::after { content: '＋'; float: right; color: var(--accent); }
+    details.settings-card[open] summary::after { content: '−'; }
+    .settings-body { padding: 0 16px 16px; display: grid; gap: 13px; }
+    .notice { background: #fff8e8; border: 1px solid #f0dfb0; border-radius: 10px; padding: 11px; color: #705b2e; font-size: 0.77rem; line-height: 1.55; }
+    .backup-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .privacy-note { color: var(--sub); font-size: 0.75rem; line-height: 1.5; }
+    @media (max-width: 380px) {
+      .summary-grid, .form-grid { grid-template-columns: 1fr; }
+      .summary-card.year-card, .field.full, .btn-primary { grid-column: auto; }
+      .summary-value { font-size: 1.12rem; }
+    }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>🎒 保育園の持ちもの</h1>
-  <div class="sub">タップしてチェック ✔</div>
+  <h1>🌷 保育園サポート</h1>
+  <div class="sub" id="headerSub">タップして持ちものをチェック</div>
 </header>
 
-<div class="progress-wrap">
-  <div class="progress-label">
-    <span>進捗</span>
-    <span><span class="count" id="doneCount">0</span> / <span id="totalCount">0</span> 完了</span>
-  </div>
-  <div class="progress-bar-bg">
-    <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
-  </div>
-  <div class="all-done" id="allDone">✅ 準備完了！いってらっしゃい🌟</div>
-</div>
+<nav class="mode-switch" aria-label="画面の切り替え">
+  <button class="mode-btn active" id="checklistTab" type="button" aria-selected="true">🎒 持ちもの</button>
+  <button class="mode-btn" id="trackerTab" type="button" aria-selected="false">📊 収入・時間</button>
+</nav>
 
-<div class="list" id="list"></div>
+<section id="checklistView">
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span>準備の進み具合</span>
+      <span><span class="count" id="doneCount">0</span> / <span id="totalCount">0</span> 完了</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+    </div>
+    <div class="all-done" id="allDone">✅ 準備完了！いってらっしゃい🌟</div>
+  </div>
 
-<div class="footer">
-  <button class="btn-reset" id="resetBtn" onclick="resetAll()">🔄 全部リセット（次の日用）</button>
-</div>
+  <div class="list" id="list"></div>
+
+  <div class="footer">
+    <button class="btn-reset" id="resetBtn" type="button">🔄 全部リセット（次の日用）</button>
+  </div>
+</section>
+
+<section id="trackerView" hidden>
+  <main class="tracker">
+    <div class="info-card">
+      <strong>この画面でできること</strong><br />
+      収入と働いた時間を記録すると、今月と今年の合計が自動でまとまります。
+    </div>
+
+    <div class="month-picker">
+      <button class="icon-btn" id="prevMonth" type="button" aria-label="前の月">‹</button>
+      <input id="selectedMonth" type="month" aria-label="表示する月" />
+      <button class="icon-btn" id="nextMonth" type="button" aria-label="次の月">›</button>
+    </div>
+
+    <div class="summary-grid">
+      <article class="summary-card income">
+        <div class="summary-label">選んだ月の収入</div>
+        <div class="summary-value" id="monthlyIncome">0円</div>
+        <div class="summary-note" id="incomeCount">記録 0件</div>
+      </article>
+      <article class="summary-card hours">
+        <div class="summary-label">選んだ月の勤務時間</div>
+        <div class="summary-value" id="monthlyHours">0 / 64時間</div>
+        <div class="mini-bar"><div class="mini-fill" id="hoursBar"></div></div>
+        <div class="summary-note" id="hoursRemaining">あと64時間</div>
+      </article>
+      <article class="summary-card income year-card">
+        <div class="year-top">
+          <div>
+            <div class="summary-label" id="yearLabel">今年の収入</div>
+            <div class="summary-value" id="yearlyIncome">0円</div>
+          </div>
+          <div class="remaining" id="incomeRemaining">目安まであと1,300,000円</div>
+        </div>
+        <div class="mini-bar"><div class="mini-fill" id="incomeBar"></div></div>
+        <div class="summary-note">年間の目安は設定から変更できます</div>
+      </article>
+    </div>
+
+    <section class="entry-card">
+      <h2>💴 収入を記録 <span>入金があったとき</span></h2>
+      <form class="form-grid" id="incomeForm">
+        <div class="field">
+          <label for="incomeDate">日付</label>
+          <input id="incomeDate" type="date" required />
+        </div>
+        <div class="field">
+          <label for="incomeSource">種類</label>
+          <select id="incomeSource" required>
+            <option value="パート">パート</option>
+            <option value="せどり">せどり</option>
+            <option value="その他">その他</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label for="incomeAmount">金額（円）</label>
+          <input id="incomeAmount" type="number" min="1" step="1" inputmode="numeric" placeholder="例：45000" required />
+        </div>
+        <div class="field full">
+          <label for="incomeMemo">メモ（空欄でもOK）</label>
+          <input id="incomeMemo" type="text" maxlength="80" placeholder="例：10月分の給料、商品Aの売上" />
+        </div>
+        <button class="btn-primary" type="submit">この収入を追加</button>
+      </form>
+      <ul class="records" id="incomeRecords"></ul>
+    </section>
+
+    <section class="entry-card hours-card">
+      <h2>⏱ 働いた時間を記録 <span>作業した日ごと</span></h2>
+      <form class="form-grid" id="hoursForm">
+        <div class="field">
+          <label for="hoursDate">日付</label>
+          <input id="hoursDate" type="date" required />
+        </div>
+        <div class="field">
+          <label for="hoursType">種類</label>
+          <select id="hoursType" required>
+            <option value="パート">パート</option>
+            <option value="せどり">せどり</option>
+            <option value="その他">その他</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label for="hoursAmount">時間</label>
+          <input id="hoursAmount" type="number" min="0.25" max="24" step="0.25" inputmode="decimal" placeholder="例：3.5" required />
+        </div>
+        <div class="field full">
+          <label for="hoursMemo">作業内容（空欄でもOK）</label>
+          <input id="hoursMemo" type="text" maxlength="80" placeholder="例：仕入れ、撮影、出品、梱包" />
+        </div>
+        <button class="btn-primary" type="submit">この時間を追加</button>
+      </form>
+      <ul class="records" id="hoursRecords"></ul>
+    </section>
+
+    <details class="settings-card">
+      <summary>⚙️ 目安・バックアップ</summary>
+      <div class="settings-body">
+        <form class="form-grid" id="settingsForm">
+          <div class="field full">
+            <label for="annualGoal">年間収入の目安（円）</label>
+            <input id="annualGoal" type="number" min="1" step="10000" inputmode="numeric" required />
+          </div>
+          <div class="field full">
+            <label for="monthlyHoursGoal">毎月の勤務時間の目安</label>
+            <input id="monthlyHoursGoal" type="number" min="1" step="1" inputmode="numeric" required />
+          </div>
+          <button class="btn-primary" type="submit">目安を保存</button>
+        </form>
+        <div class="notice">
+          130万円は健康保険の扶養を考えるときの目安の一つです。せどりは、売上からどの経費を引いて数えるかなどが加入している健康保険によって異なります。最終確認はご家族の勤務先や健康保険へお願いします。
+        </div>
+        <div class="backup-row">
+          <button class="btn-secondary" id="exportBtn" type="button">保存用ファイルを作る</button>
+          <button class="btn-secondary" id="importBtn" type="button">保存用ファイルを戻す</button>
+          <input id="importFile" type="file" accept="application/json" hidden />
+        </div>
+        <p class="privacy-note">入力した金額や時間は、このスマホの中だけに保存されます。GitHubなどインターネット上には送られません。</p>
+      </div>
+    </details>
+  </main>
+</section>
 
 <script>
 const ITEMS = [
   { id: 'application', name: '一時保育利用申込書兼保育記録' },
-  { id: 'straw',    name: 'ストローマグ / 保冷ストローマグ', note: '麦茶か水を入れてきてください' },
-  { id: 'cup',      name: 'コップ' },
+  { id: 'straw', name: 'ストローマグ / 保冷ストローマグ', note: '麦茶か水を入れてきてください' },
+  { id: 'cup', name: 'コップ' },
   { id: 'handtowel', name: 'おしぼり', note: '乾いたもの 3枚' },
   { id: 'placemat', name: 'ランチョンマット' },
-  { id: 'bib',      name: '食事用エプロン' },
-  { id: 'hat',      name: '帽子' },
-  { id: 'shoes',    name: '外ズック' },
-  { id: 'diaper',   name: 'オムツ', note: '5枚' },
-  { id: 'wipe',     name: 'おしり拭き' },
-  { id: 'towel1',   name: 'オムツ交換用タオル', note: '1枚' },
-  { id: 'towel2',   name: 'バスタオル', note: '2枚' },
-  { id: 'clothes',  name: '着替え', note: '各2枚ずつ（肌着・上下衣服・靴下）' },
+  { id: 'bib', name: '食事用エプロン' },
+  { id: 'hat', name: '帽子' },
+  { id: 'shoes', name: '外ズック' },
+  { id: 'diaper', name: 'オムツ', note: '5枚' },
+  { id: 'wipe', name: 'おしり拭き' },
+  { id: 'towel1', name: 'オムツ交換用タオル', note: '1枚' },
+  { id: 'towel2', name: 'バスタオル', note: '2枚' },
+  { id: 'clothes', name: '着替え', note: '各2枚ずつ（肌着・上下衣服・靴下）' },
   { id: 'dirtybag', name: 'ビニール袋', note: '2枚（汚れた服、使用後のおむつ入れ用）' },
-  { id: 'futon',    name: '午睡用布団セット', note: '敷パット・タオルケット・袋', pm: true },
+  { id: 'futon', name: '午睡用布団セット', note: '敷パット・タオルケット・袋', pm: true },
 ];
 
-const KEY = 'hoikuen_checks';
-let checked = JSON.parse(localStorage.getItem(KEY) || '{}');
+const CHECK_KEY = 'hoikuen_checks';
+const TRACKER_KEY = 'hoikuen_tracker_v1';
+const MONTH_KEY = 'hoikuen_tracker_month';
+const DEFAULT_TRACKER = {
+  income: [],
+  hours: [],
+  settings: { annualGoal: 1300000, monthlyHoursGoal: 64 },
+};
 
-function save() { localStorage.setItem(KEY, JSON.stringify(checked)); }
+function safeRead(key, fallback) {
+  try {
+    const value = JSON.parse(localStorage.getItem(key));
+    return value ?? fallback;
+  } catch (_) {
+    return fallback;
+  }
+}
 
-function render() {
+function localMonth(date = new Date()) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function localDate(date = new Date()) {
+  return `${localMonth(date)}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+function cleanTracker(value) {
+  const source = value && typeof value === 'object' ? value : {};
+  const settings = source.settings && typeof source.settings === 'object' ? source.settings : {};
+  return {
+    income: Array.isArray(source.income) ? source.income : [],
+    hours: Array.isArray(source.hours) ? source.hours : [],
+    settings: {
+      annualGoal: Number(settings.annualGoal) > 0 ? Number(settings.annualGoal) : DEFAULT_TRACKER.settings.annualGoal,
+      monthlyHoursGoal: Number(settings.monthlyHoursGoal) > 0 ? Number(settings.monthlyHoursGoal) : DEFAULT_TRACKER.settings.monthlyHoursGoal,
+    },
+  };
+}
+
+let checked = safeRead(CHECK_KEY, {});
+let tracker = cleanTracker(safeRead(TRACKER_KEY, DEFAULT_TRACKER));
+let selectedMonth = /^\d{4}-\d{2}$/.test(localStorage.getItem(MONTH_KEY) || '')
+  ? localStorage.getItem(MONTH_KEY)
+  : localMonth();
+
+function saveChecked() {
+  localStorage.setItem(CHECK_KEY, JSON.stringify(checked));
+}
+
+function saveTracker() {
+  localStorage.setItem(TRACKER_KEY, JSON.stringify(tracker));
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function formatYen(value) {
+  return `${Math.round(Number(value) || 0).toLocaleString('ja-JP')}円`;
+}
+
+function formatHours(value) {
+  return (Number(value) || 0).toLocaleString('ja-JP', { maximumFractionDigits: 2 });
+}
+
+function makeId() {
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function renderChecklist() {
   const list = document.getElementById('list');
   list.innerHTML = '';
   ITEMS.forEach(item => {
     const div = document.createElement('div');
-    div.className = 'item' + (checked[item.id] ? ' checked' : '');
-    div.onclick = () => toggle(item.id);
+    div.className = `item${checked[item.id] ? ' checked' : ''}`;
+    div.setAttribute('role', 'checkbox');
+    div.setAttribute('aria-checked', checked[item.id] ? 'true' : 'false');
+    div.tabIndex = 0;
+    div.addEventListener('click', () => toggleItem(item.id));
+    div.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        toggleItem(item.id);
+      }
+    });
 
     const badges = [];
     if (item.opt) badges.push('<span class="badge badge-opt">必要な方のみ</span>');
-    if (item.pm)  badges.push('<span class="badge badge-pm">午後利用の方のみ</span>');
+    if (item.pm) badges.push('<span class="badge badge-pm">午後利用の方のみ</span>');
 
     div.innerHTML = `
-      <div class="checkbox">${checked[item.id] ? '✓' : ''}</div>
+      <div class="checkbox" aria-hidden="true">${checked[item.id] ? '✓' : ''}</div>
       <div class="item-body">
-        <div class="item-name">${item.name}</div>
-        ${item.note ? `<div class="item-note">${item.note}</div>` : ''}
+        <div class="item-name">${escapeHtml(item.name)}</div>
+        ${item.note ? `<div class="item-note">${escapeHtml(item.note)}</div>` : ''}
         ${badges.length ? `<div class="badges">${badges.join('')}</div>` : ''}
       </div>
     `;
     list.appendChild(div);
   });
-  updateProgress();
+  updateChecklistProgress();
 }
 
-function toggle(id) {
+function toggleItem(id) {
   checked[id] = !checked[id];
-  save();
-  render();
+  saveChecked();
+  renderChecklist();
 }
 
-function updateProgress() {
+function updateChecklistProgress() {
   const total = ITEMS.length;
-  const done = ITEMS.filter(i => checked[i.id]).length;
+  const done = ITEMS.filter(item => checked[item.id]).length;
   document.getElementById('doneCount').textContent = done;
   document.getElementById('totalCount').textContent = total;
-  const pct = total ? (done / total * 100) : 0;
+  const percent = total ? (done / total) * 100 : 0;
   const bar = document.getElementById('progressBar');
-  bar.style.width = pct + '%';
-  bar.className = 'progress-bar-fill' + (done === total ? ' done' : '');
-  const allDone = document.getElementById('allDone');
-  allDone.style.display = (done === total && total > 0) ? 'block' : 'none';
+  bar.style.width = `${percent}%`;
+  bar.className = `progress-bar-fill${done === total ? ' done' : ''}`;
+  document.getElementById('allDone').style.display = done === total && total > 0 ? 'block' : 'none';
   document.getElementById('resetBtn').disabled = done === 0;
 }
 
-function resetAll() {
-  if (!confirm('チェックをすべてリセットしますか？')) return;
+function resetChecklist() {
+  if (!confirm('持ちもののチェックをすべてリセットしますか？')) return;
   checked = {};
-  save();
-  render();
+  saveChecked();
+  renderChecklist();
 }
 
-render();
+function setView(view) {
+  const isTracker = view === 'tracker';
+  document.getElementById('checklistView').hidden = isTracker;
+  document.getElementById('trackerView').hidden = !isTracker;
+  document.getElementById('checklistTab').classList.toggle('active', !isTracker);
+  document.getElementById('trackerTab').classList.toggle('active', isTracker);
+  document.getElementById('checklistTab').setAttribute('aria-selected', String(!isTracker));
+  document.getElementById('trackerTab').setAttribute('aria-selected', String(isTracker));
+  document.getElementById('headerSub').textContent = isTracker
+    ? '収入と働いた時間をかんたん管理'
+    : 'タップして持ちものをチェック';
+  document.body.classList.toggle('tracker-mode', isTracker);
+  if (isTracker) renderTracker();
+  window.scrollTo({ top: 0, behavior: 'auto' });
+}
+
+function changeMonth(offset) {
+  const [year, month] = selectedMonth.split('-').map(Number);
+  selectedMonth = localMonth(new Date(year, month - 1 + offset, 1));
+  localStorage.setItem(MONTH_KEY, selectedMonth);
+  renderTracker();
+}
+
+function defaultDateForMonth() {
+  return selectedMonth === localMonth() ? localDate() : `${selectedMonth}-01`;
+}
+
+function renderTracker() {
+  document.getElementById('selectedMonth').value = selectedMonth;
+  const year = selectedMonth.slice(0, 4);
+  const monthlyIncomeEntries = tracker.income.filter(entry => String(entry.date || '').startsWith(selectedMonth));
+  const monthlyHourEntries = tracker.hours.filter(entry => String(entry.date || '').startsWith(selectedMonth));
+  const yearlyIncomeEntries = tracker.income.filter(entry => String(entry.date || '').startsWith(`${year}-`));
+  const monthlyIncome = monthlyIncomeEntries.reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
+  const monthlyHours = monthlyHourEntries.reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
+  const yearlyIncome = yearlyIncomeEntries.reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
+  const hoursGoal = tracker.settings.monthlyHoursGoal;
+  const incomeGoal = tracker.settings.annualGoal;
+
+  document.getElementById('monthlyIncome').textContent = formatYen(monthlyIncome);
+  document.getElementById('incomeCount').textContent = `記録 ${monthlyIncomeEntries.length}件`;
+  document.getElementById('monthlyHours').textContent = `${formatHours(monthlyHours)} / ${formatHours(hoursGoal)}時間`;
+  document.getElementById('hoursBar').style.width = `${Math.min(100, (monthlyHours / hoursGoal) * 100)}%`;
+  document.getElementById('hoursRemaining').textContent = monthlyHours >= hoursGoal
+    ? `目安を${formatHours(monthlyHours - hoursGoal)}時間達成`
+    : `あと${formatHours(hoursGoal - monthlyHours)}時間`;
+  document.getElementById('yearLabel').textContent = `${year}年の収入`;
+  document.getElementById('yearlyIncome').textContent = formatYen(yearlyIncome);
+  document.getElementById('incomeBar').style.width = `${Math.min(100, (yearlyIncome / incomeGoal) * 100)}%`;
+  document.getElementById('incomeRemaining').textContent = yearlyIncome <= incomeGoal
+    ? `目安まであと${formatYen(incomeGoal - yearlyIncome)}`
+    : `目安を${formatYen(yearlyIncome - incomeGoal)}超えています`;
+  document.getElementById('annualGoal').value = incomeGoal;
+  document.getElementById('monthlyHoursGoal').value = hoursGoal;
+  document.getElementById('incomeDate').value = defaultDateForMonth();
+  document.getElementById('hoursDate').value = defaultDateForMonth();
+  renderRecords('incomeRecords', monthlyIncomeEntries, 'income');
+  renderRecords('hoursRecords', monthlyHourEntries, 'hours');
+}
+
+function renderRecords(elementId, entries, kind) {
+  const list = document.getElementById(elementId);
+  const sorted = [...entries].sort((a, b) => String(b.date).localeCompare(String(a.date)) || String(b.id).localeCompare(String(a.id)));
+  if (!sorted.length) {
+    list.innerHTML = '<li class="empty">この月の記録はまだありません</li>';
+    return;
+  }
+  list.innerHTML = sorted.map(entry => {
+    const value = kind === 'income' ? formatYen(entry.amount) : `${formatHours(entry.amount)}時間`;
+    const memo = entry.memo ? `・${escapeHtml(entry.memo)}` : '';
+    return `
+      <li class="record">
+        <div class="record-main">
+          <div class="record-title">${escapeHtml(entry.source)} <span class="record-value">${value}</span></div>
+          <div class="record-meta">${escapeHtml(entry.date)}${memo}</div>
+        </div>
+        <button class="btn-danger" type="button" data-delete-kind="${kind}" data-delete-id="${escapeHtml(entry.id)}">削除</button>
+      </li>`;
+  }).join('');
+}
+
+function addIncome(event) {
+  event.preventDefault();
+  const amount = Number(document.getElementById('incomeAmount').value);
+  if (!(amount > 0)) return;
+  tracker.income.push({
+    id: makeId(),
+    date: document.getElementById('incomeDate').value,
+    source: document.getElementById('incomeSource').value,
+    amount,
+    memo: document.getElementById('incomeMemo').value.trim(),
+  });
+  saveTracker();
+  event.currentTarget.reset();
+  renderTracker();
+}
+
+function addHours(event) {
+  event.preventDefault();
+  const amount = Number(document.getElementById('hoursAmount').value);
+  if (!(amount > 0)) return;
+  tracker.hours.push({
+    id: makeId(),
+    date: document.getElementById('hoursDate').value,
+    source: document.getElementById('hoursType').value,
+    amount,
+    memo: document.getElementById('hoursMemo').value.trim(),
+  });
+  saveTracker();
+  event.currentTarget.reset();
+  renderTracker();
+}
+
+function deleteRecord(kind, id) {
+  const label = kind === 'income' ? '収入' : '時間';
+  if (!confirm(`この${label}の記録を削除しますか？`)) return;
+  tracker[kind] = tracker[kind].filter(entry => entry.id !== id);
+  saveTracker();
+  renderTracker();
+}
+
+function saveSettings(event) {
+  event.preventDefault();
+  const annualGoal = Number(document.getElementById('annualGoal').value);
+  const monthlyHoursGoal = Number(document.getElementById('monthlyHoursGoal').value);
+  if (!(annualGoal > 0) || !(monthlyHoursGoal > 0)) return;
+  tracker.settings = { annualGoal, monthlyHoursGoal };
+  saveTracker();
+  renderTracker();
+  alert('目安を保存しました');
+}
+
+function exportBackup() {
+  const backup = { version: 1, savedAt: new Date().toISOString(), checked, tracker };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `hoikuen-backup-${localDate()}.json`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function importBackup(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const backup = JSON.parse(String(reader.result));
+      if (!backup || typeof backup !== 'object' || !backup.tracker) throw new Error('invalid');
+      if (!confirm('今の記録を、保存用ファイルの内容に置き換えますか？')) return;
+      tracker = cleanTracker(backup.tracker);
+      if (backup.checked && typeof backup.checked === 'object') checked = backup.checked;
+      saveTracker();
+      saveChecked();
+      renderTracker();
+      renderChecklist();
+      alert('記録を戻しました');
+    } catch (_) {
+      alert('このファイルは読み込めませんでした');
+    }
+  };
+  reader.readAsText(file);
+}
+
+document.getElementById('checklistTab').addEventListener('click', () => setView('checklist'));
+document.getElementById('trackerTab').addEventListener('click', () => setView('tracker'));
+document.getElementById('resetBtn').addEventListener('click', resetChecklist);
+document.getElementById('prevMonth').addEventListener('click', () => changeMonth(-1));
+document.getElementById('nextMonth').addEventListener('click', () => changeMonth(1));
+document.getElementById('selectedMonth').addEventListener('change', event => {
+  if (!/^\d{4}-\d{2}$/.test(event.target.value)) return;
+  selectedMonth = event.target.value;
+  localStorage.setItem(MONTH_KEY, selectedMonth);
+  renderTracker();
+});
+document.getElementById('incomeForm').addEventListener('submit', addIncome);
+document.getElementById('hoursForm').addEventListener('submit', addHours);
+document.getElementById('settingsForm').addEventListener('submit', saveSettings);
+document.getElementById('trackerView').addEventListener('click', event => {
+  const button = event.target.closest('[data-delete-kind]');
+  if (button) deleteRecord(button.dataset.deleteKind, button.dataset.deleteId);
+});
+document.getElementById('exportBtn').addEventListener('click', exportBackup);
+document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
+document.getElementById('importFile').addEventListener('change', event => {
+  importBackup(event.target.files[0]);
+  event.target.value = '';
+});
+
+renderChecklist();
+renderTracker();
 </script>
 </body>
 </html>
