@@ -275,7 +275,7 @@
     .field { display: grid; gap: 5px; }
     .field.full { grid-column: 1 / -1; }
     .field label { font-size: 0.76rem; font-weight: 700; color: var(--sub); }
-    .field input, .field select {
+    .field input, .field select, .field textarea {
       width: 100%;
       min-width: 0;
       border: 1px solid #dcc8cf;
@@ -284,7 +284,8 @@
       color: var(--text);
       background: #fff;
     }
-    .field input:focus, .field select:focus { outline: 2px solid var(--accent-light); border-color: var(--accent); }
+    .field textarea { min-height: 190px; resize: vertical; line-height: 1.55; }
+    .field input:focus, .field select:focus, .field textarea:focus { outline: 2px solid var(--accent-light); border-color: var(--accent); }
     .btn-primary, .btn-secondary, .btn-danger {
       border-radius: 12px;
       font-weight: 700;
@@ -309,6 +310,9 @@
     .record-meta { color: var(--sub); font-size: 0.73rem; margin-top: 3px; overflow-wrap: anywhere; }
     .record-value { font-weight: 800; color: var(--accent-dark); white-space: nowrap; }
     .hours-card .record-value { color: #4b9b70; }
+    .income-kind { display: inline-block; margin-left: 4px; padding: 1px 6px; border-radius: 8px; font-size: 0.65rem; font-weight: 700; }
+    .income-kind.counted { background: var(--accent-light); color: var(--accent-dark); }
+    .income-kind.excluded { background: #edf1f4; color: #65717a; }
     .empty { color: var(--sub); text-align: center; font-size: 0.82rem; padding: 12px 4px 2px; }
     details.settings-card { overflow: hidden; }
     details.settings-card summary { list-style: none; cursor: pointer; padding: 15px 16px; font-weight: 700; }
@@ -319,6 +323,7 @@
     .notice { background: #fff8e8; border: 1px solid #f0dfb0; border-radius: 10px; padding: 11px; color: #705b2e; font-size: 0.77rem; line-height: 1.55; }
     .backup-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .privacy-note { color: var(--sub); font-size: 0.75rem; line-height: 1.5; }
+    .import-result { color: #357955; font-size: 0.8rem; font-weight: 700; line-height: 1.5; }
     @media (max-width: 380px) {
       .summary-grid, .form-grid { grid-template-columns: 1fr; }
       .summary-card.year-card, .field.full, .btn-primary { grid-column: auto; }
@@ -372,9 +377,9 @@
 
     <div class="summary-grid">
       <article class="summary-card income">
-        <div class="summary-label">選んだ月の収入</div>
+        <div class="summary-label">選んだ月の全収入</div>
         <div class="summary-value" id="monthlyIncome">0円</div>
-        <div class="summary-note" id="incomeCount">記録 0件</div>
+        <div class="summary-note" id="incomeCount">目安に含む 0円・記録のみ 0円</div>
       </article>
       <article class="summary-card hours">
         <div class="summary-label">選んだ月の勤務時間</div>
@@ -391,7 +396,7 @@
           <div class="remaining" id="incomeRemaining">目安まであと1,300,000円</div>
         </div>
         <div class="mini-bar"><div class="mini-fill" id="incomeBar"></div></div>
-        <div class="summary-note">年間の目安は設定から変更できます</div>
+        <div class="summary-note" id="yearlyIncomeBreakdown">記録のみ 0円・すべて合計 0円</div>
       </article>
     </div>
 
@@ -406,13 +411,23 @@
           <label for="incomeSource">種類</label>
           <select id="incomeSource" required>
             <option value="パート">パート</option>
-            <option value="せどり">せどり</option>
+            <option value="TOKIUM">TOKIUM</option>
+            <option value="メルカリ（せどり）">メルカリ（せどり）</option>
+            <option value="メルカリ（不用品）">メルカリ（不用品）</option>
+            <option value="ジモティー">ジモティー</option>
             <option value="その他">その他</option>
           </select>
         </div>
         <div class="field full">
+          <label for="incomeGoalType">130万円の目安への入れ方</label>
+          <select id="incomeGoalType" required>
+            <option value="counted">目安に含める（給与・せどりなど）</option>
+            <option value="excluded">記録だけする（不用品販売など）</option>
+          </select>
+        </div>
+        <div class="field full">
           <label for="incomeAmount">金額（円）</label>
-          <input id="incomeAmount" type="number" min="1" step="1" inputmode="numeric" placeholder="例：45000" required />
+          <input id="incomeAmount" type="number" min="0" step="1" inputmode="numeric" placeholder="例：45000" required />
         </div>
         <div class="field full">
           <label for="incomeMemo">メモ（空欄でもOK）</label>
@@ -450,6 +465,19 @@
       </form>
       <ul class="records" id="hoursRecords"></ul>
     </section>
+
+    <details class="settings-card">
+      <summary>📝 メモから収入をまとめて追加</summary>
+      <div class="settings-body">
+        <p class="privacy-note">これまでの月別メモをそのまま貼り付けられます。「※非課税」と書かれた不用品販売は、自動で130万円の目安から外します。</p>
+        <div class="field">
+          <label for="bulkIncomeText">収入メモを貼り付け</label>
+          <textarea id="bulkIncomeText" placeholder="2026の所得&#10;&#10;TOKIUM&#10;2月 10000円&#10;3月 20000円&#10;&#10;メルカリ（不用品）※非課税&#10;1月 3000円"></textarea>
+        </div>
+        <button class="btn-primary" id="bulkImportBtn" type="button">内容を確認してまとめて追加</button>
+        <p class="import-result" id="bulkImportResult" hidden></p>
+      </div>
+    </details>
 
     <details class="settings-card">
       <summary>⚙️ 目安・バックアップ</summary>
@@ -568,6 +596,10 @@ function formatHours(value) {
   return (Number(value) || 0).toLocaleString('ja-JP', { maximumFractionDigits: 2 });
 }
 
+function countsTowardGoal(entry) {
+  return entry.countsTowardGoal !== false;
+}
+
 function makeId() {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
@@ -666,24 +698,29 @@ function renderTracker() {
   const monthlyHourEntries = tracker.hours.filter(entry => String(entry.date || '').startsWith(selectedMonth));
   const yearlyIncomeEntries = tracker.income.filter(entry => String(entry.date || '').startsWith(`${year}-`));
   const monthlyIncome = monthlyIncomeEntries.reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
+  const monthlyCountedIncome = monthlyIncomeEntries.filter(countsTowardGoal).reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
+  const monthlyExcludedIncome = monthlyIncome - monthlyCountedIncome;
   const monthlyHours = monthlyHourEntries.reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
-  const yearlyIncome = yearlyIncomeEntries.reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
+  const yearlyAllIncome = yearlyIncomeEntries.reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
+  const yearlyIncome = yearlyIncomeEntries.filter(countsTowardGoal).reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
+  const yearlyExcludedIncome = yearlyAllIncome - yearlyIncome;
   const hoursGoal = tracker.settings.monthlyHoursGoal;
   const incomeGoal = tracker.settings.annualGoal;
 
   document.getElementById('monthlyIncome').textContent = formatYen(monthlyIncome);
-  document.getElementById('incomeCount').textContent = `記録 ${monthlyIncomeEntries.length}件`;
+  document.getElementById('incomeCount').textContent = `目安に含む ${formatYen(monthlyCountedIncome)}・記録のみ ${formatYen(monthlyExcludedIncome)}`;
   document.getElementById('monthlyHours').textContent = `${formatHours(monthlyHours)} / ${formatHours(hoursGoal)}時間`;
   document.getElementById('hoursBar').style.width = `${Math.min(100, (monthlyHours / hoursGoal) * 100)}%`;
   document.getElementById('hoursRemaining').textContent = monthlyHours >= hoursGoal
     ? `目安を${formatHours(monthlyHours - hoursGoal)}時間達成`
     : `あと${formatHours(hoursGoal - monthlyHours)}時間`;
-  document.getElementById('yearLabel').textContent = `${year}年の収入`;
+  document.getElementById('yearLabel').textContent = `${year}年 130万円の目安に含める収入`;
   document.getElementById('yearlyIncome').textContent = formatYen(yearlyIncome);
   document.getElementById('incomeBar').style.width = `${Math.min(100, (yearlyIncome / incomeGoal) * 100)}%`;
   document.getElementById('incomeRemaining').textContent = yearlyIncome <= incomeGoal
     ? `目安まであと${formatYen(incomeGoal - yearlyIncome)}`
     : `目安を${formatYen(yearlyIncome - incomeGoal)}超えています`;
+  document.getElementById('yearlyIncomeBreakdown').textContent = `記録のみ ${formatYen(yearlyExcludedIncome)}・すべて合計 ${formatYen(yearlyAllIncome)}`;
   document.getElementById('annualGoal').value = incomeGoal;
   document.getElementById('monthlyHoursGoal').value = hoursGoal;
   document.getElementById('incomeDate').value = defaultDateForMonth();
@@ -702,10 +739,15 @@ function renderRecords(elementId, entries, kind) {
   list.innerHTML = sorted.map(entry => {
     const value = kind === 'income' ? formatYen(entry.amount) : `${formatHours(entry.amount)}時間`;
     const memo = entry.memo ? `・${escapeHtml(entry.memo)}` : '';
+    const incomeKind = kind === 'income'
+      ? (countsTowardGoal(entry)
+        ? '<span class="income-kind counted">目安に含む</span>'
+        : '<span class="income-kind excluded">記録のみ</span>')
+      : '';
     return `
       <li class="record">
         <div class="record-main">
-          <div class="record-title">${escapeHtml(entry.source)} <span class="record-value">${value}</span></div>
+          <div class="record-title">${escapeHtml(entry.source)} <span class="record-value">${value}</span>${incomeKind}</div>
           <div class="record-meta">${escapeHtml(entry.date)}${memo}</div>
         </div>
         <button class="btn-danger" type="button" data-delete-kind="${kind}" data-delete-id="${escapeHtml(entry.id)}">削除</button>
@@ -716,13 +758,14 @@ function renderRecords(elementId, entries, kind) {
 function addIncome(event) {
   event.preventDefault();
   const amount = Number(document.getElementById('incomeAmount').value);
-  if (!(amount > 0)) return;
+  if (!Number.isFinite(amount) || amount < 0) return;
   tracker.income.push({
     id: makeId(),
     date: document.getElementById('incomeDate').value,
     source: document.getElementById('incomeSource').value,
     amount,
     memo: document.getElementById('incomeMemo').value.trim(),
+    countsTowardGoal: document.getElementById('incomeGoalType').value === 'counted',
   });
   saveTracker();
   event.currentTarget.reset();
@@ -762,6 +805,91 @@ function saveSettings(event) {
   saveTracker();
   renderTracker();
   alert('目安を保存しました');
+}
+
+function parseBulkIncome(text) {
+  const yearMatch = text.match(/(20\d{2})/);
+  if (!yearMatch) return { year: '', entries: [] };
+  const year = yearMatch[1];
+  const entries = [];
+  let source = '';
+  let included = true;
+
+  text.split(/\r?\n/).forEach(rawLine => {
+    const line = rawLine.replaceAll('**', '').trim();
+    if (!line) return;
+
+    if (/^TOKIUM/i.test(line)) {
+      source = 'TOKIUM';
+      included = true;
+      return;
+    }
+    if (/メルカリ.*不用品/.test(line)) {
+      source = 'メルカリ（不用品）';
+      included = false;
+      return;
+    }
+    if (/メルカリ.*せどり/.test(line)) {
+      source = 'メルカリ（せどり）';
+      included = true;
+      return;
+    }
+    if (/ジモティー/.test(line)) {
+      source = 'ジモティー';
+      included = false;
+      return;
+    }
+
+    const match = line.match(/^(\d{1,2})月\s*([0-9,]+)\s*円?\s*(?:[（(]([^）)]*)[）)])?/);
+    if (!match || !source) return;
+    const month = Number(match[1]);
+    const amount = Number(match[2].replaceAll(',', ''));
+    if (month < 1 || month > 12 || !Number.isFinite(amount)) return;
+    const monthText = String(month).padStart(2, '0');
+    entries.push({
+      date: `${year}-${monthText}-01`,
+      source,
+      amount,
+      memo: match[3] ? match[3].trim() : '月合計',
+      countsTowardGoal: included,
+      importKey: `memo:${year}-${monthText}:${source}`,
+    });
+  });
+
+  return { year, entries };
+}
+
+function importBulkIncome() {
+  const text = document.getElementById('bulkIncomeText').value;
+  const parsed = parseBulkIncome(text);
+  if (!parsed.entries.length) {
+    alert('読み取れる収入がありませんでした。年、項目名、月、金額が入っているか確認してください。');
+    return;
+  }
+
+  const counted = parsed.entries.filter(countsTowardGoal).reduce((sum, entry) => sum + entry.amount, 0);
+  const excluded = parsed.entries.filter(entry => !countsTowardGoal(entry)).reduce((sum, entry) => sum + entry.amount, 0);
+  const message = `${parsed.year}年の収入を${parsed.entries.length}件追加します。\n\n130万円の目安に含む：${formatYen(counted)}\n記録のみ：${formatYen(excluded)}\n\nよろしいですか？`;
+  if (!confirm(message)) return;
+
+  let added = 0;
+  let updated = 0;
+  parsed.entries.forEach(entry => {
+    const existingIndex = tracker.income.findIndex(item => item.importKey === entry.importKey);
+    if (existingIndex >= 0) {
+      tracker.income[existingIndex] = { ...tracker.income[existingIndex], ...entry };
+      updated += 1;
+    } else {
+      tracker.income.push({ id: makeId(), ...entry });
+      added += 1;
+    }
+  });
+
+  saveTracker();
+  renderTracker();
+  const result = document.getElementById('bulkImportResult');
+  result.textContent = `${added}件を追加、${updated}件を更新しました。すべて合計は${formatYen(counted + excluded)}です。`;
+  result.hidden = false;
 }
 
 function exportBackup() {
@@ -810,9 +938,14 @@ document.getElementById('selectedMonth').addEventListener('change', event => {
   localStorage.setItem(MONTH_KEY, selectedMonth);
   renderTracker();
 });
+document.getElementById('incomeSource').addEventListener('change', event => {
+  const recordOnly = ['メルカリ（不用品）', 'ジモティー'].includes(event.target.value);
+  document.getElementById('incomeGoalType').value = recordOnly ? 'excluded' : 'counted';
+});
 document.getElementById('incomeForm').addEventListener('submit', addIncome);
 document.getElementById('hoursForm').addEventListener('submit', addHours);
 document.getElementById('settingsForm').addEventListener('submit', saveSettings);
+document.getElementById('bulkImportBtn').addEventListener('click', importBulkIncome);
 document.getElementById('trackerView').addEventListener('click', event => {
   const button = event.target.closest('[data-delete-kind]');
   if (button) deleteRecord(button.dataset.deleteKind, button.dataset.deleteId);
