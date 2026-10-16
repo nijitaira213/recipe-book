@@ -329,8 +329,11 @@
     .settings-body { padding: 0 16px 16px; display: grid; gap: 13px; }
     .notice { background: #fff8e8; border: 1px solid #f0dfb0; border-radius: 10px; padding: 11px; color: #705b2e; font-size: 0.77rem; line-height: 1.55; }
     .backup-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .file-picker { position: relative; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; }
+    .file-picker input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
     .privacy-note { color: var(--sub); font-size: 0.75rem; line-height: 1.5; }
     .import-result { color: #357955; font-size: 0.8rem; font-weight: 700; line-height: 1.5; }
+    .import-result.error { color: #b44b4b; }
     @media (max-width: 520px) {
       .summary-grid, .form-grid { grid-template-columns: minmax(0, 1fr); }
       .summary-card.year-card, .field.full, .btn-primary { grid-column: auto; }
@@ -517,9 +520,12 @@
         </div>
         <div class="backup-row">
           <button class="btn-secondary" id="exportBtn" type="button">保存用ファイルを作る</button>
-          <button class="btn-secondary" id="importBtn" type="button">保存用ファイルを戻す</button>
-          <input id="importFile" type="file" accept="application/json" hidden />
+          <label class="btn-secondary file-picker">
+            <span>保存用ファイルを戻す</span>
+            <input id="importFile" type="file" accept=".json,application/json" aria-label="保存用ファイルを戻す" />
+          </label>
         </div>
+        <p class="import-result" id="backupResult" aria-live="polite" hidden></p>
         <p class="privacy-note">入力した金額や時間は、このスマホの中だけに保存されます。GitHubなどインターネット上には送られません。</p>
       </div>
     </details>
@@ -951,37 +957,81 @@ function importBulkIncome() {
 }
 
 function exportBackup() {
-  const backup = { version: 1, savedAt: new Date().toISOString(), checked, tracker };
+  const backup = { version: 2, savedAt: new Date().toISOString(), selectedMonth, checked, tracker };
   const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = `hoikuen-backup-${localDate()}.json`;
+  link.download = `en-to-oshigoto-backup-${localDate()}.json`;
   document.body.appendChild(link);
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
+  showBackupResult('保存用ファイルを作りました。iPhoneの「ファイル」アプリ内のダウンロードに保存されます。');
+}
+
+function showBackupResult(message, isError = false) {
+  const result = document.getElementById('backupResult');
+  result.textContent = message;
+  result.classList.toggle('error', isError);
+  result.hidden = false;
+}
+
+function latestRecordedMonth(restoredTracker) {
+  const countedMonths = restoredTracker.income
+    .filter(entry => countsTowardGoal(entry) && Number(entry.amount || 0) > 0)
+    .map(entry => String(entry.date || '').slice(0, 7))
+    .filter(month => /^\d{4}-\d{2}$/.test(month));
+  const allMonths = [...restoredTracker.income, ...restoredTracker.hours]
+    .map(entry => String(entry.date || '').slice(0, 7))
+    .filter(month => /^\d{4}-\d{2}$/.test(month));
+  const months = countedMonths.length ? countedMonths : allMonths;
+  months.sort();
+  return months.length ? months[months.length - 1] : selectedMonth;
 }
 
 function importBackup(file) {
-  if (!file) return;
+  if (!file) {
+    showBackupResult('ファイルが選ばれていません。古いアプリで作った保存用ファイルを選んでください。', true);
+    return;
+  }
+  showBackupResult(`「${file.name}」を確認しています…`);
   const reader = new FileReader();
   reader.onload = () => {
     try {
       const backup = JSON.parse(String(reader.result));
       if (!backup || typeof backup !== 'object' || !backup.tracker) throw new Error('invalid');
-      if (!confirm('今の記録を、保存用ファイルの内容に置き換えますか？')) return;
-      tracker = cleanTracker(backup.tracker);
-      if (backup.checked && typeof backup.checked === 'object') checked = backup.checked;
+      const restoredTracker = cleanTracker(backup.tracker);
+      const restoredChecked = backup.checked && typeof backup.checked === 'object' ? backup.checked : {};
+      const incomeCount = restoredTracker.income.length;
+      const hoursCount = restoredTracker.hours.length;
+      const checkedCount = Object.values(restoredChecked).filter(Boolean).length;
+      if (!incomeCount && !hoursCount && !checkedCount) {
+        showBackupResult('この保存用ファイルには記録が入っていません。古いアプリで作ったファイルを選んでください。', true);
+        return;
+      }
+      const currentCount = tracker.income.length + tracker.hours.length + Object.values(checked).filter(Boolean).length;
+      if (currentCount && !confirm(`収入${incomeCount}件・勤務時間${hoursCount}件を戻します。今の記録を置き換えてよいですか？`)) {
+        showBackupResult('復元をキャンセルしました。');
+        return;
+      }
+      tracker = restoredTracker;
+      checked = restoredChecked;
+      selectedMonth = /^\d{4}-\d{2}$/.test(backup.selectedMonth || '')
+        ? backup.selectedMonth
+        : latestRecordedMonth(restoredTracker);
+      localStorage.setItem(MONTH_KEY, selectedMonth);
       saveTracker();
       saveChecked();
       renderTracker();
       renderChecklist();
-      alert('記録を戻しました');
+      showBackupResult(`記録を戻しました。収入${incomeCount}件・勤務時間${hoursCount}件です。${selectedMonth.replace('-', '年')}月を表示しています。`);
     } catch (_) {
-      alert('このファイルは読み込めませんでした');
+      showBackupResult('このファイルは読み込めませんでした。古いアプリで作ったJSONファイルを選んでください。', true);
     }
   };
+  reader.onerror = () => showBackupResult('ファイルを読み込めませんでした。もう一度選び直してください。', true);
+  reader.onabort = () => showBackupResult('ファイルの読み込みを中止しました。', true);
   reader.readAsText(file);
 }
 
@@ -1009,7 +1059,6 @@ document.getElementById('trackerView').addEventListener('click', event => {
   if (button) deleteRecord(button.dataset.deleteKind, button.dataset.deleteId);
 });
 document.getElementById('exportBtn').addEventListener('click', exportBackup);
-document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
 document.getElementById('importFile').addEventListener('change', event => {
   importBackup(event.target.files[0]);
   event.target.value = '';
